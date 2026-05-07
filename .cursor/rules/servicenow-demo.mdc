@@ -1,0 +1,80 @@
+---
+description: Auto-route ServiceNow demo provisioning requests to the SN-Deploy-Demo orchestrator
+alwaysApply: true
+---
+
+# ServiceNow Demo Deployment
+
+This workspace exposes an MCP orchestrator tool, **`SN-Deploy-Demo`**, that
+provisions a complete ServiceNow demo for a client in a single call.
+
+## When to use it
+
+Use `SN-Deploy-Demo` whenever the user asks to **deploy, set up, bootstrap,
+provision, seed, onboard, stand up, spin up, or scaffold** a ServiceNow demo
+(or "demo data", "demo environment", "demo tenant") for any client, customer,
+tenant, organisation, or company.
+
+Common phrasings — all should route to `SN-Deploy-Demo`:
+
+- "Set up a ServiceNow demo for HealthCorp"
+- "Deploy a demo for Acme Manufacturing"
+- "Onboard ABC Hospital as a demo client"
+- "Bootstrap a demo tenant for XYZ Retail"
+- "Seed demo data for ContosoBank"
+
+## What NOT to do
+
+Do **not** assemble a demo out of `SN-Create-Record`, `SN-Batch-Create`,
+`SN-Create-Incident`, `SN-Catalog-Submit`, or other primitives. Those are
+low-level building blocks and produce inconsistent, non-idempotent,
+hard-to-hand-off results when used for demo seeding.
+
+`SN-Deploy-Demo` already handles ordering, idempotency, Update Set wrapping,
+and branding for you.
+
+## Payload schema (single JSON string)
+
+```json
+{
+  "clientName": "<display name, e.g. \"HealthCorp\">",
+  "clientPrefix": "<alphanumeric only, used in property names, e.g. \"HealthCorp\">",
+  "primaryColor": "#RRGGBB",
+  "secondaryColor": "#RRGGBB",
+  "categories": [
+    { "name": "<category title>", "description": "..." }
+  ],
+  "catalogItems": [
+    { "name": "...", "category": "<must match a category name above>", "short_description": "..." }
+  ],
+  "users": [
+    { "first_name": "...", "last_name": "...", "user_name": "...", "email": "...", "title": "..." }
+  ],
+  "incidents": [
+    { "short_description": "...", "description": "...", "category": "software|network|hardware|inquiry|database|security", "correlation_id": "<stable unique id>" }
+  ]
+}
+```
+
+## Authoring guidance
+
+- **Tailor content to the client's industry.** Healthcare → EHR / PACS / HIPAA / pharmacy / telehealth. Manufacturing → MES / SCADA / PLC / shop floor. Retail → POS / inventory / e-commerce. Banking → core banking / fraud / compliance. Use realistic terminology.
+- Generate **at least 5 categories, 6+ catalog items, 2+ users, 5+ incidents** unless the user specifies otherwise.
+- `clientPrefix` MUST be alphanumeric/underscore only (no spaces, no hyphens, no special chars). It is used in `sys_properties` names like `<clientPrefix>.demo.client_name`.
+- Each catalog item's `category` field MUST exactly match the `name` of one of the categories in the same payload — the orchestrator resolves names → sys_ids internally.
+- Use a stable, unique `correlation_id` per incident (e.g. `<clientPrefix>-INC-<area>-<seq>`) so re-running the deploy is a no-op for already-created incidents.
+- A reference payload lives at `examples/sample-payload-healthcare.json` — use it as a few-shot example for shape and depth.
+
+## Example invocation
+
+For "Set up a ServiceNow demo for HealthCorp":
+
+```
+SN-Deploy-Demo({ payload: "{\"clientName\":\"HealthCorp\",\"clientPrefix\":\"HealthCorp\", ...}" })
+```
+
+## After the call
+
+Summarise the receipt: created vs skipped counts per entity type, the
+Update Set name + sys_id, and any entries in the `errors` array. The receipt
+is the operator's source of truth for what the deploy actually did.
