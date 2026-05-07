@@ -284,7 +284,7 @@ async function upsertIncidents(serviceNowClient, incidents, userMap, out) {
   }
 }
 
-async function upsertHrCases(serviceNowClient, hrCases, out) {
+async function upsertHrCases(serviceNowClient, hrCases, userMap, out) {
   if (!Array.isArray(hrCases) || hrCases.length === 0) return;
   // Plugin probe first — sn_hr_core_case is gated by HRSD. If it's missing we
   // skip the whole batch with a friendly note rather than 404'ing per record.
@@ -325,6 +325,11 @@ async function upsertHrCases(serviceNowClient, hrCases, out) {
         description: c.description || ''
       };
       if (c.correlation_id) data.correlation_id = c.correlation_id;
+      if (c.state != null && c.state !== '') data.state = c.state;
+      if (c.priority != null && c.priority !== '') data.priority = String(c.priority);
+      if (c.assigned_username && userMap && userMap[c.assigned_username]) {
+        data.assigned_to = userMap[c.assigned_username];
+      }
       const created = await serviceNowClient.createRecord('sn_hr_core_case', data);
       out.hr_cases.created.push({
         number: created.number,
@@ -374,6 +379,7 @@ async function upsertPurchaseOrders(serviceNowClient, pos, out) {
       const data = { short_description: p.short_description };
       if (p.total_cost != null) data.total_cost = String(p.total_cost);
       if (p.correlation_id) data.correlation_id = p.correlation_id;
+      if (p.state != null && p.state !== '') data.state = p.state;
       const created = await serviceNowClient.createRecord('proc_po', data);
       out.purchase_orders.created.push({
         number: created.number,
@@ -417,7 +423,7 @@ export async function applyData(serviceNowClient, payload, options = {}) {
   }
 
   await upsertIncidents(serviceNowClient, incidents, userMap, out);
-  await upsertHrCases(serviceNowClient, hrCases, out);
+  await upsertHrCases(serviceNowClient, hrCases, userMap, out);
   await upsertPurchaseOrders(serviceNowClient, pos, out);
 
   // Flat aliases preserved for back-compat with any caller still treating

@@ -1,0 +1,14 @@
+---
+description: ServiceNow demos and provisioning only via MCP — no local .js script artifacts
+alwaysApply: true
+---
+
+# ServiceNow: MCP only (no local .js)
+
+For ServiceNow demos, data seeding, and provisioning in this workspace:
+
+- **Use MCP tools only** (e.g. `SN-Deploy-Demo`, `SN-Demo-Apply-Data`, `SN-Demo-Apply-Personas`, `SN-Demo-Apply-Branding`, `SN-Create-Record`, `SN-Batch-Create`, `SN-Query-Table`, and other `SN-*` REST-backed tools on the connected MCP server).
+- **Do not** call `SN-Execute-Background-Script` for routine demo setup when it creates **local `.js` files** under `~/scripts/` or elsewhere as a fallback, and **do not** add Background Script `.js` files to the repo or tell the user to run them unless they explicitly ask for background scripting.
+- **Do not** create or leave standalone `.js` deploy helpers for ServiceNow when the same outcome is achievable through the MCP orchestrator and payload JSON.
+
+If background execution is truly required and the user did not ask for scripts, prefer explaining that **`SN-Deploy-Demo` is the primary path** and keep all definitions in the JSON payload.

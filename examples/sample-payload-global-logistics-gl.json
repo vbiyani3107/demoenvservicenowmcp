@@ -1,0 +1,178 @@
+{
+  "clientName": "Global Logistics",
+  "clientPrefix": "GL",
+  "primaryColor": "#0F2940",
+  "secondaryColor": "#C8943C",
+  "heroBackgroundColor": "#0F2940",
+  "categories": [
+    {
+      "name": "GL - HR Services & Talent",
+      "description": "Onboarding, payroll, benefits, and workforce compliance for drivers, warehouse, customs, and corporate roles across Global Logistics regions."
+    },
+    {
+      "name": "GL - Procurement & Fleet",
+      "description": "Spend requests, vendor onboarding, fleet and warehouse equipment purchasing, and supplier compliance for logistics operations."
+    }
+  ],
+  "catalogItems": [
+    {
+      "name": "GL - New hire onboarding bundle",
+      "category": "GL - HR Services & Talent",
+      "short_description": "Coordinate equipment, badging, dock access, and HR tasks for new hires at distribution centers and corporate offices."
+    },
+    {
+      "name": "GL - Payroll correction / off-cycle payment",
+      "category": "GL - HR Services & Talent",
+      "short_description": "Request a payroll adjustment, manual check, or off-cycle run for driver overtime, cross-border pay, or garnishment updates."
+    },
+    {
+      "name": "GL - Fleet & warehouse equipment purchase",
+      "category": "GL - Procurement & Fleet",
+      "short_description": "Source forklifts, RF scanners, refrigeration maintenance, and packaging materials through standard procurement approval."
+    },
+    {
+      "name": "GL - Customs & trade services engagement",
+      "category": "GL - Procurement & Fleet",
+      "short_description": "Engage customs brokerage, ABI filing credits, and trade compliance services for cross-border lanes."
+    }
+  ],
+  "personas": [
+    {
+      "user_name": "gl_procurement_manager",
+      "first_name": "Jordan",
+      "last_name": "Reyes",
+      "email": "jordan.reyes@global-logistics.demo",
+      "title": "Procurement Manager",
+      "department": "Procurement",
+      "roles": ["procurement_manager"]
+    },
+    {
+      "user_name": "gl_hr_specialist",
+      "first_name": "Amelia",
+      "last_name": "Park",
+      "email": "amelia.park@global-logistics.demo",
+      "title": "HR Specialist",
+      "department": "Human Resources",
+      "roles": ["sn_hr_core.hrsd_agent"]
+    }
+  ],
+  "incidents": [],
+  "hr_cases": [
+    {
+      "short_description": "Onboarding — Miami DC: security badge and dock access not provisioned for week-one associate",
+      "description": "New warehouse associate reports badge printer failure during orientation; turnstile profile missing. Need expedited physical badge and WMS dock door group.",
+      "correlation_id": "GL_hrc_1",
+      "assigned_username": "gl_hr_specialist"
+    },
+    {
+      "short_description": "Onboarding — Rotterdam hub: payroll profile not linked to time clocks",
+      "description": "EMEA hire shows in HRIS but punch data routes to legacy vendor code; payroll cannot accrue hours for first pay period.",
+      "correlation_id": "GL_hrc_2",
+      "assigned_username": "gl_hr_specialist"
+    },
+    {
+      "short_description": "Onboarding — DOT driver packet stuck on prior employer verification",
+      "description": "Safety waiting on PSP and prior employer safety release; driver cannot be dispatched until cleared.",
+      "correlation_id": "GL_hrc_3",
+      "assigned_username": "gl_hr_specialist"
+    },
+    {
+      "short_description": "Onboarding — Remote customs analyst: VPN and SOX training not assigned in LMS",
+      "description": "Provisioning completed but compliance curricula not released; user blocked from production customs systems.",
+      "correlation_id": "GL_hrc_4",
+      "assigned_username": "gl_hr_specialist"
+    },
+    {
+      "short_description": "Onboarding — Seasonal surge batch: I-9 reverification blocking bulk activate",
+      "description": "Peak staffing cohort held in pending status due to document mismatch on Section 2; need HR guidance on acceptable receipts.",
+      "correlation_id": "GL_hrc_5",
+      "assigned_username": "gl_hr_specialist"
+    },
+    {
+      "short_description": "Payroll — Last mile driver route bonuses misrated in April overtime calc",
+      "description": "Routing engine bonuses omitted from OT rate stack for three terminals; union steward escalation.",
+      "correlation_id": "GL_hrc_6",
+      "assigned_username": "gl_hr_specialist"
+    },
+    {
+      "short_description": "Payroll — CAD mobility stipend gross-up incorrect for Toronto assignee",
+      "description": "Cross-border policy applied US multiplier; net pay short against relocation letter.",
+      "correlation_id": "GL_hrc_7",
+      "assigned_username": "gl_hr_specialist"
+    },
+    {
+      "short_description": "Payroll — Garnishment amendment not applied for two cycles (hub supervisor)",
+      "description": "Court order received mid-period; payroll still using stale deduction amount.",
+      "correlation_id": "GL_hrc_8",
+      "assigned_username": "gl_hr_specialist"
+    },
+    {
+      "short_description": "Payroll — 401k deferral change after cutoff; request manual adjustment",
+      "description": "Employee submitted rate change one day late; Fidelity file already transmitted.",
+      "correlation_id": "GL_hrc_9",
+      "assigned_username": "gl_hr_specialist"
+    },
+    {
+      "short_description": "Payroll — Contractor hours vs W2 extract mismatch on consolidated file",
+      "description": "Finance reconciliation shows vendor invoice hours diverge from payroll extract for same resource.",
+      "correlation_id": "GL_hrc_10",
+      "assigned_username": "gl_hr_specialist"
+    }
+  ],
+  "purchase_orders": [
+    {
+      "short_description": "Cross-dock electric pallet jack fleet replacement — Southeast DC network",
+      "total_cost": "48500",
+      "correlation_id": "GL_po_1"
+    },
+    {
+      "short_description": "Refrigerated trailer annual maintenance and roadside assistance contract",
+      "total_cost": "112000",
+      "correlation_id": "GL_po_2"
+    },
+    {
+      "short_description": "RF scanners and rugged handhelds — Midwest regional refresh",
+      "total_cost": "76200",
+      "correlation_id": "GL_po_3"
+    },
+    {
+      "short_description": "Customs brokerage retainer and ABI filing credits — FY ramp",
+      "total_cost": "24000",
+      "correlation_id": "GL_po_4"
+    },
+    {
+      "short_description": "Sustainable packaging materials pilot — biodegradable stretch wrap and corner boards",
+      "total_cost": "58900",
+      "correlation_id": "GL_po_5"
+    }
+  ],
+  "reports": [
+    {
+      "title": "GL - HR cases by priority",
+      "table": "sn_hr_core_case",
+      "type": "donut",
+      "field": "priority"
+    },
+    {
+      "title": "GL - Purchase orders by state",
+      "table": "proc_po",
+      "type": "bar",
+      "field": "state"
+    }
+  ],
+  "dashboard": {
+    "pageId": "index",
+    "widgets": [
+      {
+        "id": "demo_kpi_dashboard",
+        "order": 100,
+        "title": "GL — Operations KPIs"
+      },
+      {
+        "id": "demo_announcements",
+        "order": 200,
+        "title": "GL — HR & Procurement notices"
+      }
+    ]
+  }
+}
