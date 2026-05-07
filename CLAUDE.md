@@ -20,6 +20,16 @@
 - **ONLY** when MCP tools have documented limitations
 - **ALWAYS** try MCP batch operations first (5-10+ parallel calls)
 
+### Demo / client provisioning — MCP only (no local `.js`)
+
+This policy matches `.cursor/rules/servicenow-mcp-only.mdc` and applies whenever the user is **standing up or seeding a ServiceNow demo** (users, catalog, HR cases, purchase orders, branding, reports, etc.):
+
+- **Use MCP only:** prefer **`SN-Deploy-Demo`** (single JSON payload) or the composed **`SN-Demo-Apply-*`** tools. All of that is **REST**; there is no need for local script files in the repo.
+- **Do not** use **`SN-Execute-Background-Script`** for **routine** demo setup. In particular, avoid **`execution_method: "ui"`** (or any path) that **writes a local `.js` file** (e.g. under `~/scripts/`) as a fallback — do not create or recommend those artifacts unless the user **explicitly** asks for background scripting.
+- **Do not** add **Background Script** `.js` files to the project or tell the user to paste into *Scripts - Background* for standard provisioning; keep the source of truth in **JSON payload** files (see `examples/sample-payload-*.json`).
+
+For **non-demo** operations (e.g. one-off server-side logic the user requests), the priority order above still applies, but always prefer **`SN-Execute-Background-Script`** with the default reliable execution path over options that leave local files.
+
 ---
 
 ## 🎯 MCP Tools (40+ Total)
