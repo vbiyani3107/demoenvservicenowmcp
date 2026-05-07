@@ -1,7 +1,11 @@
-#!/bin/bash
-cd /Users/nczitzer/WebstormProjects/happy-platform-mcp
-export SERVICENOW_INSTANCE_URL=https://dev276360.service-now.com
-export SERVICENOW_USERNAME=admin
-export SERVICENOW_PASSWORD='$h4fG+9nAGeU'
-export SERVICENOW_AUTH_TYPE=basic
-node src/stdio-server.js
+#!/usr/bin/env bash
+# Run the MCP stdio server from this repo. Configure secrets via .env (never commit .env).
+set -euo pipefail
+cd "$(dirname "$0")"
+if [[ -f .env ]]; then
+  set -a
+  # shellcheck disable=SC1091
+  source .env
+  set +a
+fi
+exec node src/stdio-server.js

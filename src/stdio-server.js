@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * Happy MCP Server - Stdio Transport
+ * Demo Env ServiceNow MCP - Stdio Transport
  *
- * Copyright (c) 2025 Happy Technologies LLC
+ * Copyright (c) 2025 Vinay Kumar Biyani
  * Licensed under the MIT License - see LICENSE file for details
  */
 
@@ -46,7 +46,7 @@ export async function createConfiguredMcpServer({
   createServer = createMcpServer
 } = {}) {
   const startDocsOnly = async () => {
-    console.error('📚 Starting Happy MCP in docs-only mode');
+    console.error('📚 Starting Demo Env ServiceNow MCP in docs-only mode');
     return {
       server: await createServer(null, { docsOnly: true }),
       docsOnly: true,
@@ -104,14 +104,14 @@ export async function main() {
     // Connect server to transport
     await server.connect(transport);
 
-    console.error('Happy MCP Server (stdio) started successfully');
+    console.error('Demo Env ServiceNow MCP (stdio) started successfully');
     if (docsOnly) {
       console.error('Mode: docs-only');
     } else {
       console.error(`Instance: ${instance.name} - ${instance.url}`);
     }
   } catch (error) {
-    console.error('Failed to start Happy MCP Server:', error);
+    console.error('Failed to start Demo Env ServiceNow MCP:', error);
     process.exit(1);
   }
 }

@@ -1,5 +1,5 @@
 /**
- * Mock utilities for Happy MCP Server tests
+ * Mock utilities for Demo Env ServiceNow MCP tests
  */
 
 import { jest } from '@jest/globals';

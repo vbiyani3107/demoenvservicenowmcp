@@ -10,11 +10,11 @@
 
 ## Reporting a Vulnerability
 
-Happy Technologies LLC takes security seriously. If you discover a security vulnerability in this project, please report it responsibly.
+The maintainers take security seriously. If you discover a security vulnerability in this project, please report it responsibly.
 
 ### How to Report
 
-**Email:** security@happy-tech.biz
+**Preferred:** Open a [GitHub Security Advisory](https://github.com/vbiyani3107/demoenvservicenowmcp/security/advisories/new) for this repository (private submission).
 
 Please include:
 - A description of the vulnerability
@@ -47,7 +47,7 @@ This project connects to ServiceNow® instances using credentials you provide. P
 
 ## Scope
 
-This security policy covers the Happy MCP Server source code and its direct dependencies. It does not cover:
+This security policy covers the Demo Env ServiceNow MCP source code and its direct dependencies. It does not cover:
 
 - Your ServiceNow® instance configuration or security posture
 - Third-party plugins or extensions

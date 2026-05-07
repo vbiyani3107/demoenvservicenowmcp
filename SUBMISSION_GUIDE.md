@@ -1,23 +1,23 @@
 # MCP Server Directory Submissions
 
-This guide tracks submissions to major MCP directories for the ServiceNow MCP Server.
+This guide tracks submissions to major MCP directories for Demo Env ServiceNow MCP (`demoenvservicenowmcp`).
 
 ## ✅ Already Published
 
 ### 1. Official MCP Registry
 - **Status:** ✅ Published
-- **URL:** https://registry.modelcontextprotocol.io/servers/io.github.nickzitzer/servicenow-nodejs
+- **URL:** https://registry.modelcontextprotocol.io/servers/io.github.vbiyani3107/demoenvservicenowmcp
 - **Version:** 2.1.1
 - **Date:** 2025-10-17
 
 ### 2. npm Registry
 - **Status:** ✅ Published
-- **URL:** https://www.npmjs.com/package/servicenow-mcp-server
+- **URL:** https://www.npmjs.com/package/demoenvservicenowmcp
 - **Version:** 2.1.1
 
 ### 3. Docker Hub
 - **Status:** ✅ Published
-- **URL:** https://hub.docker.com/r/nczitzer/mcp-servicenow-nodejs
+- **URL:** https://hub.docker.com/r/vbiyani3107/demoenvservicenowmcp
 - **Tags:** 2.1.1, latest
 
 ---
@@ -37,14 +37,14 @@ This guide tracks submissions to major MCP directories for the ServiceNow MCP Se
 
 **Server Entry Format:**
 ```markdown
-### ServiceNow MCP Server
+### Demo Env ServiceNow MCP
 Multi-instance ServiceNow MCP server with 40+ tools, natural language search, and local script development.
 
-- **Author:** nczitzer (Happy Technologies LLC)
-- **Repository:** https://github.com/Happy-Technologies-LLC/mcp-servicenow-nodejs
-- **npm:** https://www.npmjs.com/package/servicenow-mcp-server
-- **Docker:** https://hub.docker.com/r/nczitzer/mcp-servicenow-nodejs
-- **MCP Registry:** https://registry.modelcontextprotocol.io/servers/io.github.nickzitzer/servicenow-nodejs
+- **Author:** Vinay Kumar Biyani
+- **Repository:** https://github.com/vbiyani3107/demoenvservicenowmcp
+- **npm:** https://www.npmjs.com/package/demoenvservicenowmcp
+- **Docker:** https://hub.docker.com/r/vbiyani3107/demoenvservicenowmcp
+- **MCP Registry:** https://registry.modelcontextprotocol.io/servers/io.github.vbiyani3107/demoenvservicenowmcp
 - **Features:**
   - 40+ MCP tools for ServiceNow operations
   - Multi-instance support
@@ -67,7 +67,7 @@ Multi-instance ServiceNow MCP server with 40+ tools, natural language search, an
 **Steps:**
 1. Go to: https://github.com/cline/mcp-marketplace/issues/new
 2. Create issue with:
-   - **GitHub Repo URL:** https://github.com/Happy-Technologies-LLC/mcp-servicenow-nodejs
+   - **GitHub Repo URL:** https://github.com/vbiyani3107/demoenvservicenowmcp
    - **Logo Image:** 400×400 PNG (use assets/logo.svg converted to PNG)
 3. Wait for review (typically a couple days)
 
@@ -91,8 +91,8 @@ convert assets/logo.svg -resize 400x400 assets/logo-400x400.png
 1. Visit https://smithery.ai/
 2. Look for "Submit Server" or "Add Server" option
 3. Provide server details:
-   - npm package: servicenow-mcp-server
-   - GitHub: https://github.com/Happy-Technologies-LLC/mcp-servicenow-nodejs
+   - npm package: demoenvservicenowmcp
+   - GitHub: https://github.com/vbiyani3107/demoenvservicenowmcp
    - Description: Multi-instance ServiceNow MCP server with 40+ tools
 
 **Alternative:** Check https://github.com/smithery-ai for submission guidelines
@@ -113,7 +113,7 @@ convert assets/logo.svg -resize 400x400 assets/logo-400x400.png
 
 **Steps:**
 1. Visit https://mcphub.io/
-2. Search for "servicenow-mcp-server" to see if auto-indexed
+2. Search for "demoenvservicenowmcp" to see if auto-indexed
 3. If not found, look for submission form
 
 **Status:** 🟡 Check if auto-indexed
@@ -195,27 +195,27 @@ convert assets/logo.svg -resize 400x400 assets/logo-400x400.png
 
 Use this standardized information for all submissions:
 
-**Name:** ServiceNow MCP Server
+**Name:** Demo Env ServiceNow MCP
 
 **Short Description:** Multi-instance ServiceNow MCP server with 40+ tools and intelligent schema discovery
 
 **Long Description:**
 A revolutionary metadata-driven ServiceNow MCP server supporting multiple ServiceNow instances simultaneously with automatic schema discovery and optimized tool generation. Features 40+ MCP tools, natural language search, local script development with Git integration, and comprehensive ITSM operations.
 
-**Author:** nczitzer / Happy Technologies LLC
+**Author:** Vinay Kumar Biyani
 
-**License:** MIT
+**License:** Apache-2.0
 
 **Category:** ITSM, Enterprise, Automation, ServiceNow
 
 **Tags:** servicenow, itsm, mcp, automation, enterprise, multi-instance, workflow, cmdb, service-catalog
 
 **Links:**
-- GitHub: https://github.com/Happy-Technologies-LLC/mcp-servicenow-nodejs
-- npm: https://www.npmjs.com/package/servicenow-mcp-server
-- Docker Hub: https://hub.docker.com/r/nczitzer/mcp-servicenow-nodejs
-- MCP Registry: https://registry.modelcontextprotocol.io/servers/io.github.nickzitzer/servicenow-nodejs
-- Documentation: https://github.com/Happy-Technologies-LLC/mcp-servicenow-nodejs#readme
+- GitHub: https://github.com/vbiyani3107/demoenvservicenowmcp
+- npm: https://www.npmjs.com/package/demoenvservicenowmcp
+- Docker Hub: https://hub.docker.com/r/vbiyani3107/demoenvservicenowmcp
+- MCP Registry: https://registry.modelcontextprotocol.io/servers/io.github.vbiyani3107/demoenvservicenowmcp
+- Documentation: https://github.com/vbiyani3107/demoenvservicenowmcp#readme
 
 **Key Features:**
 - 40+ MCP tools for ServiceNow operations
@@ -232,10 +232,10 @@ A revolutionary metadata-driven ServiceNow MCP server supporting multiple Servic
 **Installation:**
 ```bash
 # npm
-npm install -g servicenow-mcp-server
+npm install -g demoenvservicenowmcp
 
 # Docker
-docker pull nczitzer/mcp-servicenow-nodejs:latest
+docker pull vbiyani3107/demoenvservicenowmcp:latest
 
 # Via MCP Registry
 # Use Claude Desktop MCP browser
@@ -247,7 +247,7 @@ docker pull nczitzer/mcp-servicenow-nodejs:latest
 export SERVICENOW_INSTANCE_URL=https://dev.service-now.com
 export SERVICENOW_USERNAME=admin
 export SERVICENOW_PASSWORD=password
-servicenow-mcp-server
+demoenvservicenowmcp
 ```
 
 **Logo:**
@@ -289,9 +289,9 @@ For each directory:
 
 | Directory | Status | Date Submitted | Date Approved | Listing URL |
 |-----------|--------|----------------|---------------|-------------|
-| Official MCP Registry | ✅ Live | 2025-10-17 | 2025-10-17 | https://registry.modelcontextprotocol.io/servers/io.github.nickzitzer/servicenow-nodejs |
-| npm Registry | ✅ Live | 2025-10-17 | 2025-10-17 | https://www.npmjs.com/package/servicenow-mcp-server |
-| Docker Hub | ✅ Live | 2025-10-17 | 2025-10-17 | https://hub.docker.com/r/nczitzer/mcp-servicenow-nodejs |
+| Official MCP Registry | ✅ Live | 2025-10-17 | 2025-10-17 | https://registry.modelcontextprotocol.io/servers/io.github.vbiyani3107/demoenvservicenowmcp |
+| npm Registry | ✅ Live | 2025-10-17 | 2025-10-17 | https://www.npmjs.com/package/demoenvservicenowmcp |
+| Docker Hub | ✅ Live | 2025-10-17 | 2025-10-17 | https://hub.docker.com/r/vbiyani3107/demoenvservicenowmcp |
 | Anthropic Servers (GitHub) | 🟡 Ready | - | - | - |
 | Cline Marketplace | 🟡 Ready | - | - | - |
 | MCPHub.io | 🟡 Check | - | - | - |
@@ -314,8 +314,8 @@ For each directory:
 
 - MCP Specification: https://spec.modelcontextprotocol.io/
 - MCP SDK: https://www.npmjs.com/package/@modelcontextprotocol/sdk
-- Project Repository: https://github.com/Happy-Technologies-LLC/mcp-servicenow-nodejs
-- Happy Technologies: https://happy-tech.biz
+- Project Repository: https://github.com/vbiyani3107/demoenvservicenowmcp
+- Maintainer: https://github.com/vbiyani3107
 
 ---
 

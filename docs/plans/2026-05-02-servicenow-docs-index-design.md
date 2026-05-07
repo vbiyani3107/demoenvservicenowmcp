@@ -2,13 +2,13 @@
 
 ## Goal
 
-Add an optional ServiceNow documentation capability to Happy MCP that can search and retrieve the official ServiceNowDocs markdown corpus without depending on QMD or any user-local index.
+Add an optional ServiceNow documentation capability to Demo Env ServiceNow MCP that can search and retrieve the official ServiceNowDocs markdown corpus without depending on QMD or any user-local index.
 
 ## Context
 
 ServiceNow now publishes documentation in markdown through `ServiceNow/ServiceNowDocs`. The repository is a better source for AI retrieval than the JavaScript-driven public docs site because agents can fetch branch-specific markdown directly from GitHub.
 
-Happy MCP should use that repository as the source of truth while keeping local storage optional. The product must work in npm and Docker MCP Registry installs without requiring users to pre-download thousands of files or run a separate vector database.
+Demo Env ServiceNow MCP should use that repository as the source of truth while keeping local storage optional. The product must work in npm and Docker MCP Registry installs without requiring users to pre-download thousands of files or run a separate vector database.
 
 ## Architecture
 
@@ -49,7 +49,7 @@ Later tools:
 Default cache path:
 
 ```text
-~/.happy-platform-mcp/docs/servicenow/
+~/.demoenvservicenowmcp/docs/servicenow/
 ```
 
 Configurable with:
@@ -63,7 +63,7 @@ HAPPY_DOCS_EMBEDDING_PROVIDER=none|openai|local
 SQLite database:
 
 ```text
-~/.happy-platform-mcp/docs/servicenow/index.sqlite
+~/.demoenvservicenowmcp/docs/servicenow/index.sqlite
 ```
 
 Minimum tables:

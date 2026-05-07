@@ -1,18 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Release script for happy-platform-mcp
+# Release script for demoenvservicenowmcp
 # Publishes to: GitHub (tag + release), npm (new + deprecation notice on old), Docker Hub
 # Usage:
 #   ./scripts/release.sh          # publish current version from package.json
 #   ./scripts/release.sh 3.1.0    # bump to 3.1.0, commit, then publish
 
-NPM_PACKAGE="happy-platform-mcp"
+NPM_PACKAGE="demoenvservicenowmcp"
 NPM_OLD_PACKAGE="servicenow-mcp-server"
-DOCKER_USER="nczitzer"
-DOCKER_IMAGE="happy-platform-mcp"
-DOCKER_OLD_IMAGE="mcp-servicenow-nodejs"
-REPO="Happy-Technologies-LLC/happy-platform-mcp"
+DOCKER_USER="${DOCKER_USER:-vbiyani3107}"
+DOCKER_IMAGE="demoenvservicenowmcp"
+REPO="vbiyani3107/demoenvservicenowmcp"
 
 cd "$(git rev-parse --show-toplevel)"
 
@@ -110,7 +109,6 @@ fi
 echo ""
 echo "==> [5/5] Docker build & push"
 FULL_IMAGE="${DOCKER_USER}/${DOCKER_IMAGE}"
-FULL_OLD_IMAGE="${DOCKER_USER}/${DOCKER_OLD_IMAGE}"
 
 # Extract major.minor for semver tags
 MAJOR=$(echo "$VERSION" | cut -d. -f1)
@@ -122,8 +120,6 @@ docker build \
   -t "${FULL_IMAGE}:${MINOR}" \
   -t "${FULL_IMAGE}:${MAJOR}" \
   -t "${FULL_IMAGE}:latest" \
-  -t "${FULL_OLD_IMAGE}:${VERSION}" \
-  -t "${FULL_OLD_IMAGE}:latest" \
   .
 
 echo "  Pushing new image tags..."
@@ -132,12 +128,7 @@ docker push "${FULL_IMAGE}:${MINOR}"
 docker push "${FULL_IMAGE}:${MAJOR}"
 docker push "${FULL_IMAGE}:latest"
 
-echo "  Pushing final tags to old image (for migration)..."
-docker push "${FULL_OLD_IMAGE}:${VERSION}"
-docker push "${FULL_OLD_IMAGE}:latest"
-
 echo "  Pushed ${FULL_IMAGE}:{${VERSION},${MINOR},${MAJOR},latest}"
-echo "  Pushed ${FULL_OLD_IMAGE}:{${VERSION},latest} (migration)"
 
 # --- Done ---
 echo ""
@@ -151,5 +142,5 @@ echo "  Docker:  https://hub.docker.com/r/${DOCKER_USER}/${DOCKER_IMAGE}/tags"
 echo ""
 echo "  Migration notes:"
 echo "    npm:    Users should run 'npm install ${NPM_PACKAGE}' (old package deprecated)"
-echo "    Docker: Users should pull '${FULL_IMAGE}' (old image gets final tag only)"
+echo "    Docker: Users should pull '${FULL_IMAGE}'"
 echo ""

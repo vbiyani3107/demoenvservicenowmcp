@@ -1,7 +1,7 @@
 /**
- * Happy MCP Server - Multi-Instance Configuration Manager
+ * Demo Env ServiceNow MCP - Multi-Instance Configuration Manager
  *
- * Copyright (c) 2025 Happy Technologies LLC
+ * Copyright (c) 2025 Vinay Kumar Biyani
  * Licensed under the MIT License - see LICENSE file for details
  */
 

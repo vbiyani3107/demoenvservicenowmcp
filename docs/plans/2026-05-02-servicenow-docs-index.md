@@ -6,7 +6,7 @@
 
 **Architecture:** The docs feature is a self-contained `src/docs/` module. It defaults to live GitHub metadata/document fetches, can sync selected ServiceNowDocs families into a local cache, and uses SQLite FTS5 for product-grade local search. Vectorization is opt-in and layered behind a capability check so missing sqlite-vec never breaks baseline docs search.
 
-**Tech Stack:** Node.js ESM, MCP SDK request handlers, SQLite FTS5, optional sqlite-vec, Jest, mocked GitHub HTTP responses, local filesystem cache under `~/.happy-platform-mcp/docs/servicenow`.
+**Tech Stack:** Node.js ESM, MCP SDK request handlers, SQLite FTS5, optional sqlite-vec, Jest, mocked GitHub HTTP responses, local filesystem cache under `~/.demoenvservicenowmcp/docs/servicenow`.
 
 ---
 
@@ -44,7 +44,7 @@ describe('docs config', () => {
   test('uses the default cache directory under the user home', () => {
     delete process.env.HAPPY_DOCS_CACHE_DIR;
     const config = getDocsConfig();
-    expect(config.cacheDir).toBe(path.join(os.homedir(), '.happy-platform-mcp', 'docs', 'servicenow'));
+    expect(config.cacheDir).toBe(path.join(os.homedir(), '.demoenvservicenowmcp', 'docs', 'servicenow'));
     expect(config.enableVector).toBe(false);
   });
 
@@ -83,7 +83,7 @@ Create `src/docs/config.js`:
 import os from 'os';
 import path from 'path';
 
-const DEFAULT_CACHE_DIR = path.join(os.homedir(), '.happy-platform-mcp', 'docs', 'servicenow');
+const DEFAULT_CACHE_DIR = path.join(os.homedir(), '.demoenvservicenowmcp', 'docs', 'servicenow');
 
 export function getDocsConfig(env = process.env) {
   return {
@@ -982,7 +982,7 @@ Create `docs/SERVICENOW_DOCS_SEARCH.md` with:
 ```markdown
 # ServiceNow Docs Search
 
-Happy MCP can search the official ServiceNowDocs markdown repository.
+Demo Env ServiceNow MCP can search the official ServiceNowDocs markdown repository.
 
 ## Modes
 
@@ -1064,7 +1064,7 @@ Expected: output includes all five `SN-Docs-*` tools.
 Run:
 
 ```bash
-docker build -t happy-platform-mcp:docs-search .
+docker build -t demoenvservicenowmcp:docs-search .
 ```
 
 Expected: image builds successfully.

@@ -253,7 +253,7 @@ Try these in your ServiceNow instance (via Postman or curl):
 
 ## 📝 Notes from Limitations Document
 
-From `/Users/nczitzer/ServiceNowDevelopment/docs/MCP_Tool_Limitations.md`:
+From `docs/MCP_Tool_Limitations.md` in this repository (or your local docs checkout):
 
 ### Known Working (95%+ success):
 - ✅ Create records (most tables)

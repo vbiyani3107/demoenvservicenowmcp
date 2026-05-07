@@ -1,7 +1,7 @@
 /**
- * Happy MCP Server - MCP Tool Registration
+ * Demo Env ServiceNow MCP - MCP Tool Registration
  *
- * Copyright (c) 2025 Happy Technologies LLC
+ * Copyright (c) 2025 Vinay Kumar Biyani
  * Licensed under the MIT License - see LICENSE file for details
  */
 
@@ -14,6 +14,17 @@ import { syncScript, syncAllScripts, SCRIPT_TYPES } from './script-sync.js';
 import { parseNaturalLanguage, getSupportedPatterns } from './natural-language.js';
 import { docsToolDefinitions } from './docs/tool-definitions.js';
 import { handleDocsTool } from './docs/tool-handlers.js';
+import {
+  applyBranding as demoApplyBranding,
+  applyPersonas as demoApplyPersonas,
+  applyData as demoApplyData,
+  applyCatalog as demoApplyCatalog,
+  applyWidgetOverrides as demoApplyWidgetOverrides,
+  applyReports as demoApplyReports,
+  applyDashboard as demoApplyDashboard,
+  revertDemo as demoRevertDemo,
+  deployDemo as demoDeployDemo
+} from './demo-orchestrator.js';
 
 export async function createMcpServer(serviceNowClient, options = {}) {
   const docsOnly = options.docsOnly === true;
@@ -1363,6 +1374,278 @@ export async function createMcpServer(serviceNowClient, options = {}) {
               description: 'Instance name (optional, uses default if not specified)'
             }
           }
+        }
+      },
+      {
+        name: 'SN-Deploy-Demo',
+        description: 'PREFERRED TOOL for any request that asks to deploy / set up / bootstrap / provision / seed / onboard / stand up / spin up / scaffold a ServiceNow demo (or demo data, demo environment, demo tenant) for a client / customer / tenant / organisation / company. Single-call orchestrator: creates or reuses a dedicated Update Set, applies branding (theme CSS + optional hero container background), then idempotently provisions Service Catalog categories, catalog items, sys_users, incidents, HR cases (sn_hr_core_case, plugin-gated), purchase orders (proc_po, plugin-gated), sys_report rows used by dashboards, and Service Portal widget bindings (sp_instance) on the index page. Skip-if-exists semantics keyed on sc_category.title, sc_cat_item.name, sys_user.user_name, incident/hr_case/po.correlation_id, sys_report.title, and (sp_column, sp_widget) — safe to re-run. STRONGLY PREFER this tool over calling SN-Create-Record / SN-Batch-Create / SN-Create-Incident / SN-Catalog-Submit individually for client demo provisioning. Input is a single JSON string (payload) with shape: {"clientName":"...","clientPrefix":"<alphanumeric>","primaryColor":"#hex","secondaryColor":"#hex","heroBackgroundColor":"#hex","categories":[{"name":"...","description":"..."}],"catalogItems":[{"name":"...","category":"<must match a category name above>","short_description":"..."}],"users":[{"first_name":"...","last_name":"...","user_name":"...","email":"...","title":"..."}],"incidents":[{"short_description":"...","description":"...","category":"software|network|hardware|inquiry|database|security","correlation_id":"<stable unique id>"}],"hr_cases":[{"short_description":"...","correlation_id":"<prefix>_hrc_<n>"}],"purchase_orders":[{"short_description":"...","total_cost":"123","correlation_id":"<prefix>_po_<n>"}],"reports":[{"title":"<prefix> - ...","table":"incident","type":"donut","field":"category"}],"dashboard":{"pageId":"index","widgets":[{"id":"<sp_widget.id>","order":100,"title":"..."}]}}. Tailor generated content to the client industry. Returns a structured receipt of created vs skipped records per entity type plus the Update Set sys_id.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            payload: {
+              type: 'string',
+              description: 'Minified JSON string with the full demo spec. Schema: {"clientName":"...","clientPrefix":"...","primaryColor":"#hex","secondaryColor":"#hex","heroBackgroundColor":"#hex","heroBackgroundImage":"<sys_attachment url or sys_id>","categories":[{"name":"...","description":"..."}],"catalogItems":[{"name":"...","category":"<category title>","short_description":"..."}],"users":[{"first_name":"...","last_name":"...","user_name":"...","email":"...","title":"..."}],"incidents":[{"short_description":"...","description":"...","category":"software","correlation_id":"..."}],"hr_cases":[{"short_description":"...","correlation_id":"<prefix>_hrc_1"}],"purchase_orders":[{"short_description":"...","total_cost":"100","correlation_id":"<prefix>_po_1"}],"reports":[{"title":"<prefix> - Open Incidents","table":"incident","type":"donut","field":"category"}],"dashboard":{"pageId":"index","widgets":[{"id":"demo_kpi_dashboard","order":100}]}}'
+            },
+            instance: {
+              type: 'string',
+              description: 'Instance name (optional, uses default if not specified)'
+            }
+          },
+          required: ['payload']
+        }
+      },
+      {
+        name: 'SN-Demo-Apply-Branding',
+        description: 'Apply visual branding to all Service Portals: regex-injects a master CSS override block (colors, navbar, logo background) into every sp_theme bound to an active sp_portal, and (optionally) stores a base64-encoded logo as a sys_attachment first. Routes through the DemoOrchestratorAPI Script Include via /api/global/demo_orchestrator/branding so the regex + GlideSysAttachment work runs server-side in one transaction. Idempotent: re-running replaces the previously injected block (delimited by /* -- DEMO MASTER OVERRIDE -- */). Use this for the visible/visual branding; use SN-Deploy-Demo for the full client provisioning umbrella.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            clientName: { type: 'string', description: 'Client display name; used to derive the logo file name.' },
+            primaryColor: { type: 'string', description: 'Hex primary brand color (e.g. "#00A3A1"). Default "#00A3A1".' },
+            secondaryColor: { type: 'string', description: 'Hex secondary brand color. Default "#003366".' },
+            navbarBgColor: { type: 'string', description: 'Optional navbar background hex; defaults to secondaryColor.' },
+            navbarTextColor: { type: 'string', description: 'Optional navbar text hex; defaults to "#ffffff".' },
+            logoUrl: { type: 'string', description: 'Optional pre-existing logo URL. If set, no upload is performed.' },
+            logoBase64: { type: 'string', description: 'Optional raw base64 logo payload (no "data:" prefix). Triggers a sys_attachment upload server-side.' },
+            logoMimeType: { type: 'string', description: 'Optional MIME type for logoBase64 (default "image/png").' },
+            heroBackgroundColor: { type: 'string', description: 'Optional hex. If set, MCP also patches sp_container.background_color for the index page\'s first container after the Script Include returns.' },
+            heroBackgroundImage: { type: 'string', description: 'Optional sys_attachment URL or sys_id; defaults to "" (clear). Patched onto the index page\'s first sp_container.' },
+            heroPageId: { type: 'string', description: 'Optional sp_page.id for the hero container patch. Defaults to "index".' },
+            instance: { type: 'string', description: 'Instance name (optional, uses default if not specified).' }
+          },
+          required: ['clientName']
+        }
+      },
+      {
+        name: 'SN-Demo-Apply-Personas',
+        description: 'Idempotent upsert of demo personas (users + role assignments + manager links). Operates on sys_user (keyed on user_name), sys_user_role, sys_user_has_role. Pure REST — no Script Include needed. A second pass resolves manager_username references after every persona has a sys_id, so order in the array does not matter. Roles that do not exist on the instance are reported as errors but do not abort the rest of the run.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            personas: {
+              type: 'array',
+              description: 'Array of persona objects.',
+              items: {
+                type: 'object',
+                properties: {
+                  user_name: { type: 'string' },
+                  first_name: { type: 'string' },
+                  last_name: { type: 'string' },
+                  email: { type: 'string' },
+                  title: { type: 'string' },
+                  department: { type: 'string' },
+                  manager_username: { type: 'string', description: 'user_name of another persona in this same array.' },
+                  roles: { type: 'array', items: { type: 'string' }, description: 'sys_user_role.name values.' }
+                },
+                required: ['user_name']
+              }
+            },
+            instance: { type: 'string' }
+          },
+          required: ['personas']
+        }
+      },
+      {
+        name: 'SN-Demo-Apply-Data',
+        description: 'Idempotent upsert of demo data records: incidents, plus optional HR cases (sn_hr_core_case) and purchase orders (proc_po). Each batch is keyed on correlation_id when supplied (recommended). Optional caller_username on incidents gets resolved against an existing sys_user.user_name. HR cases and purchase orders are gated by their plugins (HRSD / Procurement); if the target table is missing the batch is skipped cleanly without erroring. Pure REST. Use this AFTER SN-Demo-Apply-Personas if you want incidents to have callers.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            incidents: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  short_description: { type: 'string' },
+                  description: { type: 'string' },
+                  category: { type: 'string', description: 'software|network|hardware|inquiry|database|security' },
+                  urgency: { type: ['string', 'number'] },
+                  impact: { type: ['string', 'number'] },
+                  correlation_id: { type: 'string', description: 'Stable unique id used for idempotency.' },
+                  caller_username: { type: 'string' }
+                },
+                required: ['short_description']
+              }
+            },
+            hr_cases: {
+              type: 'array',
+              description: 'HR cases (sn_hr_core_case). Skipped silently if the HRSD plugin is not active.',
+              items: {
+                type: 'object',
+                properties: {
+                  short_description: { type: 'string' },
+                  description: { type: 'string' },
+                  correlation_id: { type: 'string', description: 'Use clientPrefix_hrc_<n> so revertByPrefix can clean up.' }
+                },
+                required: ['short_description']
+              }
+            },
+            purchase_orders: {
+              type: 'array',
+              description: 'Purchase orders (proc_po). Skipped silently if the Procurement plugin is not active.',
+              items: {
+                type: 'object',
+                properties: {
+                  short_description: { type: 'string' },
+                  total_cost: { type: ['string', 'number'] },
+                  correlation_id: { type: 'string', description: 'Use clientPrefix_po_<n> so revertByPrefix can clean up.' }
+                },
+                required: ['short_description']
+              }
+            },
+            instance: { type: 'string' }
+          },
+          required: []
+        }
+      },
+      {
+        name: 'SN-Demo-Apply-Catalog',
+        description: 'Idempotent upsert of Service Catalog content: sc_category (keyed on title), sc_cat_item (keyed on name), and per-item variables (item_option_new) with optional choices (question_choice). Resolves a default active sc_catalog automatically. Pure REST. Use the variables field for dynamic forms; type defaults to 6 (single-line text).',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            categories: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  name: { type: 'string', description: 'Stored as sc_category.title.' },
+                  description: { type: 'string' }
+                },
+                required: ['name']
+              }
+            },
+            catalogItems: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  name: { type: 'string' },
+                  category: { type: 'string', description: 'Must match a category.name above.' },
+                  short_description: { type: 'string' },
+                  description: { type: 'string' },
+                  price: { type: ['string', 'number'] },
+                  variables: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        name: { type: 'string' },
+                        question: { type: 'string' },
+                        type: { type: ['string', 'number'], description: 'item_option_new.type. Defaults to 6 (single-line text).' },
+                        order: { type: ['string', 'number'] },
+                        choices: {
+                          type: 'array',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              label: { type: 'string' },
+                              value: { type: 'string' },
+                              order: { type: ['string', 'number'] }
+                            },
+                            required: ['value']
+                          }
+                        }
+                      },
+                      required: ['name']
+                    }
+                  }
+                },
+                required: ['name']
+              }
+            },
+            instance: { type: 'string' }
+          },
+          required: []
+        }
+      },
+      {
+        name: 'SN-Demo-Apply-Widget-Overrides',
+        description: 'Relabel Service Portal widget instances by matching their current title and patching sp_instance.title in place. Useful for swapping homepage hero/announcement copy without rebuilding portal pages. Pure REST.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            widgetOverrides: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  originalTitle: { type: 'string' },
+                  newTitle: { type: 'string' }
+                },
+                required: ['originalTitle', 'newTitle']
+              }
+            },
+            instance: { type: 'string' }
+          },
+          required: ['widgetOverrides']
+        }
+      },
+      {
+        name: 'SN-Demo-Apply-Dashboard',
+        description: 'Bind one or more pre-existing Service Portal widgets (sp_widget) to a portal page\'s first column as sp_instance records. Resolves the column via dot-walked query (sp_row.sp_container.sp_page=<page>^ORDERBYorder). Idempotent on (sp_column, sp_widget) — re-running is a no-op. Does NOT create sp_widget records — they must already exist on the instance (Update Set / scoped app). When clientPrefix is supplied, every new sp_instance is stamped with class_name="demo-<clientPrefix>" (Bootstrap class hook) so SN-Demo-Revert can sweep widget bindings cleanly. Pure REST.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            pageId: { type: 'string', description: 'sp_page.id; defaults to "index".' },
+            clientPrefix: { type: 'string', description: 'Recommended. Stamps sp_instance.class_name with "demo-<clientPrefix>" for clean revert via SN-Demo-Revert.' },
+            widgets: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  id: { type: 'string', description: 'sp_widget.id (e.g. "demo_kpi_dashboard").' },
+                  order: { type: ['string', 'number'], description: 'sp_instance.order; defaults to 100.' },
+                  title: { type: 'string', description: 'Optional sp_instance.title override.' },
+                  instanceFields: {
+                    type: 'object',
+                    description: 'Optional extra columns to set on sp_instance (e.g. bootstrap_alt, css).'
+                  }
+                },
+                required: ['id']
+              }
+            },
+            instance: { type: 'string' }
+          },
+          required: ['widgets']
+        }
+      },
+      {
+        name: 'SN-Demo-Apply-Reports',
+        description: 'Idempotent upsert of demo sys_report records used by Service Portal dashboard widgets. Keyed on title — callers should prefix titles with the clientPrefix (e.g. "CompanyA - Open Incidents by Category") so SN-Demo-Revert can clean them up via STARTSWITH. Pure REST. Use AFTER SN-Demo-Apply-Catalog if reports target newly-created tables/categories.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            reports: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  title: { type: 'string', description: 'sys_report.title — used as the idempotency key.' },
+                  table: { type: 'string', description: 'Target table the report runs against (e.g. sc_req_item, incident).' },
+                  type: { type: 'string', description: 'Chart type: donut, bar, pie, list, etc.' },
+                  field: { type: 'string', description: 'Optional aggregation/group field.' },
+                  filter: { type: 'string', description: 'Optional encoded query filter.' },
+                  group_by: { type: 'string' }
+                },
+                required: ['title', 'table', 'type']
+              }
+            },
+            instance: { type: 'string' }
+          },
+          required: ['reports']
+        }
+      },
+      {
+        name: 'SN-Demo-Revert',
+        description: 'Tear down a demo by clientPrefix. Bulk-deletes prefixed sc_cat_item, sc_category, sys_user, incident, sn_hr_core_case, proc_po, and sys_report records via deleteMultiple() (one transaction per table — far faster than N REST DELETEs), restores the index page hero container background to defaults, and strips the master CSS override block from every sp_theme. Routes through the DemoOrchestratorAPI Script Include /api/global/demo_orchestrator/revert. Safe to run repeatedly; missing records and plugin-gated tables (HRSD/Procurement) are skipped without aborting the run.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            clientPrefix: { type: 'string', description: 'Same prefix used during deploy (e.g. "CompanyA"). Drives the STARTSWITH queries.' },
+            instance: { type: 'string' }
+          },
+          required: ['clientPrefix']
         }
       },
       ...docsToolDefinitions
@@ -3007,6 +3290,141 @@ The problem has been closed successfully.`
           };
         }
 
+        case 'SN-Demo-Apply-Branding': {
+          const result = await demoApplyBranding(serviceNowClient, args);
+          const ok = result && result.ok !== false;
+          return {
+            content: [{
+              type: 'text',
+              text: `${ok ? '✅' : '⚠️'} SN-Demo-Apply-Branding ${ok ? 'completed' : 'completed with errors'}.\n${JSON.stringify(result, null, 2)}`
+            }],
+            isError: !ok
+          };
+        }
+
+        case 'SN-Demo-Apply-Personas': {
+          const result = await demoApplyPersonas(serviceNowClient, args.personas || []);
+          const ok = result.errors.length === 0;
+          return {
+            content: [{
+              type: 'text',
+              text: `${ok ? '✅' : '⚠️'} SN-Demo-Apply-Personas: ${result.created.length} created, ${result.skipped.length} skipped, ${result.roles_assigned} roles assigned, ${result.errors.length} errors.\n${JSON.stringify(result, null, 2)}`
+            }],
+            isError: !ok && result.created.length === 0 && result.skipped.length === 0
+          };
+        }
+
+        case 'SN-Demo-Apply-Data': {
+          const result = await demoApplyData(serviceNowClient, {
+            incidents: args.incidents || [],
+            hr_cases: args.hr_cases || [],
+            purchase_orders: args.purchase_orders || []
+          });
+          const ok = result.errors.length === 0;
+          const totalCreated = result.incidents.created.length + result.hr_cases.created.length + result.purchase_orders.created.length;
+          return {
+            content: [{
+              type: 'text',
+              text: `${ok ? '✅' : '⚠️'} SN-Demo-Apply-Data: ${result.incidents.created.length} incidents, ${result.hr_cases.created.length} HR cases, ${result.purchase_orders.created.length} purchase orders created, ${result.errors.length} errors.\n${JSON.stringify(result, null, 2)}`
+            }],
+            isError: !ok && totalCreated === 0
+          };
+        }
+
+        case 'SN-Demo-Apply-Catalog': {
+          const result = await demoApplyCatalog(
+            serviceNowClient,
+            args.categories || [],
+            args.catalogItems || []
+          );
+          const ok = result.errors.length === 0;
+          return {
+            content: [{
+              type: 'text',
+              text: `${ok ? '✅' : '⚠️'} SN-Demo-Apply-Catalog: ${result.categories.created.length} categories, ${result.catalogItems.created.length} items, ${result.variables_created} variables, ${result.choices_created} choices created. ${result.errors.length} errors.\n${JSON.stringify(result, null, 2)}`
+            }],
+            isError: !ok && result.categories.created.length === 0 && result.catalogItems.created.length === 0
+          };
+        }
+
+        case 'SN-Demo-Apply-Widget-Overrides': {
+          const result = await demoApplyWidgetOverrides(serviceNowClient, args.widgetOverrides || []);
+          const ok = result.errors.length === 0;
+          return {
+            content: [{
+              type: 'text',
+              text: `${ok ? '✅' : '⚠️'} SN-Demo-Apply-Widget-Overrides: ${result.applied.length} applied, ${result.skipped.length} skipped, ${result.errors.length} errors.\n${JSON.stringify(result, null, 2)}`
+            }],
+            isError: !ok && result.applied.length === 0
+          };
+        }
+
+        case 'SN-Demo-Apply-Dashboard': {
+          const result = await demoApplyDashboard(serviceNowClient, {
+            pageId: args.pageId,
+            clientPrefix: args.clientPrefix,
+            widgets: args.widgets || []
+          });
+          const ok = result.errors.length === 0 && result.widgets.missing.length === 0;
+          return {
+            content: [{
+              type: 'text',
+              text: `${ok ? '✅' : '⚠️'} SN-Demo-Apply-Dashboard: ${result.widgets.created.length} bound, ${result.widgets.skipped.length} already bound, ${result.widgets.missing.length} missing widget(s), ${result.errors.length} errors.\n${JSON.stringify(result, null, 2)}`
+            }],
+            isError: result.errors.length > 0 && result.widgets.created.length === 0
+          };
+        }
+
+        case 'SN-Demo-Apply-Reports': {
+          const result = await demoApplyReports(serviceNowClient, args.reports || []);
+          const ok = result.errors.length === 0;
+          return {
+            content: [{
+              type: 'text',
+              text: `${ok ? '✅' : '⚠️'} SN-Demo-Apply-Reports: ${result.created.length} created, ${result.skipped.length} skipped, ${result.errors.length} errors.\n${JSON.stringify(result, null, 2)}`
+            }],
+            isError: !ok && result.created.length === 0
+          };
+        }
+
+        case 'SN-Demo-Revert': {
+          const result = await demoRevertDemo(serviceNowClient, args.clientPrefix);
+          const ok = result && result.ok !== false;
+          return {
+            content: [{
+              type: 'text',
+              text: `${ok ? '✅' : '⚠️'} SN-Demo-Revert for "${args.clientPrefix}": ${ok ? 'complete' : 'completed with errors'}.\n${JSON.stringify(result, null, 2)}`
+            }],
+            isError: !ok
+          };
+        }
+
+        case 'SN-Deploy-Demo': {
+          const { payload } = args;
+
+          if (!payload || typeof payload !== 'string') {
+            throw new Error('payload must be a JSON string. Example: SN-Deploy-Demo({ payload: "{\\"clientName\\":\\"...\\", ...}" })');
+          }
+
+          let spec;
+          try {
+            spec = JSON.parse(payload);
+          } catch (e) {
+            throw new Error(`payload is not valid JSON: ${e.message}`);
+          }
+
+          const receipt = await demoDeployDemo(serviceNowClient, spec);
+          const overallOk = receipt.errors.length === 0;
+          console.error(`${overallOk ? '✅' : '⚠️'} SN-Deploy-Demo finished: ${JSON.stringify(receipt.summary)}`);
+          return {
+            content: [{
+              type: 'text',
+              text: `${overallOk ? '✅' : '⚠️'} SN-Deploy-Demo for "${spec.clientName}" (${spec.clientPrefix}) ${overallOk ? 'completed' : 'completed with errors'}.\n\nSummary:\n${JSON.stringify(receipt.summary, null, 2)}\n\nFull receipt:\n${JSON.stringify(receipt, null, 2)}`
+            }],
+            isError: !overallOk && (receipt.summary.categories_created + receipt.summary.catalog_items_created + receipt.summary.users_created + receipt.summary.incidents_created === 0)
+          };
+        }
+
         default:
           throw new Error(`Unknown tool: ${name}`);
       }
@@ -3047,7 +3465,7 @@ The problem has been closed successfully.`
     if (uri === 'servicenow://instance') {
       const config = {
         server_info: {
-          name: 'Happy MCP Server (Consolidated)',
+          name: 'Demo Env ServiceNow MCP (Consolidated)',
           version: '2.0.0',
           description: 'Consolidated ServiceNow integration with metadata-driven schema lookups'
         },

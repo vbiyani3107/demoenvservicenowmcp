@@ -26,7 +26,7 @@ Add to your Claude Desktop configuration (`~/Library/Application Support/Claude/
   "mcpServers": {
     "servicenow": {
       "command": "node",
-      "args": ["/Users/nczitzer/WebstormProjects/mcp-servicenow-nodejs/src/stdio-server.js"],
+      "args": ["/path/to/demoenvservicenowmcp/src/stdio-server.js"],
       "env": {
         "SERVICENOW_INSTANCE_URL": "https://dev276360.service-now.com",
         "SERVICENOW_USERNAME": "admin",

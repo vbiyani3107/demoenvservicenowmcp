@@ -41,7 +41,7 @@ docker run -d \
   -e SERVICENOW_USERNAME=admin \
   -e SERVICENOW_PASSWORD=password \
   -e SSE_KEEPALIVE_INTERVAL=15000 \
-  nczitzer/mcp-servicenow-nodejs:latest
+  vbiyani3107/demoenvservicenowmcp:latest
 ```
 
 ### 2. Docker Compose
@@ -51,7 +51,7 @@ version: '3.8'
 
 services:
   servicenow-mcp-server:
-    image: nczitzer/mcp-servicenow-nodejs:latest
+    image: vbiyani3107/demoenvservicenowmcp:latest
     container_name: servicenow-mcp-server
     ports:
       - "3000:3000"
@@ -337,12 +337,12 @@ version: '3.8'
 
 services:
   servicenow-mcp-1:
-    image: nczitzer/mcp-servicenow-nodejs:latest
+    image: vbiyani3107/demoenvservicenowmcp:latest
     environment:
       - SSE_KEEPALIVE_INTERVAL=10000
 
   servicenow-mcp-2:
-    image: nczitzer/mcp-servicenow-nodejs:latest
+    image: vbiyani3107/demoenvservicenowmcp:latest
     environment:
       - SSE_KEEPALIVE_INTERVAL=10000
 
@@ -399,7 +399,7 @@ spec:
     spec:
       containers:
       - name: servicenow-mcp
-        image: nczitzer/mcp-servicenow-nodejs:latest
+        image: vbiyani3107/demoenvservicenowmcp:latest
         ports:
         - containerPort: 3000
         env:
@@ -496,7 +496,7 @@ These comments:
 4. Check proxy config: Ensure buffering disabled
 
 **Still having problems?**
-- GitHub Issues: https://github.com/Happy-Technologies-LLC/mcp-servicenow-nodejs/issues
+- GitHub Issues: https://github.com/vbiyani3107/demoenvservicenowmcp/issues
 - Include: Server logs, proxy config, keepalive interval
 
 ---
@@ -511,4 +511,4 @@ These comments:
 
 **Version:** 2.1.4
 **Updated:** 2025-11-19
-**Author:** Happy Technologies LLC
+**Author:** Vinay Kumar Biyani

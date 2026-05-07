@@ -1,6 +1,6 @@
 # ServiceNow Docs Search
 
-Happy MCP can search and retrieve the official ServiceNowDocs markdown repository without depending on QMD or any user-local index.
+Demo Env ServiceNow MCP can search and retrieve the official ServiceNowDocs markdown repository without depending on QMD or any user-local index.
 
 ## Modes
 
@@ -12,7 +12,7 @@ Happy MCP can search and retrieve the official ServiceNowDocs markdown repositor
 
 ```bash
 HAPPY_DOCS_ENABLE_LOCAL_INDEX=false
-HAPPY_DOCS_CACHE_DIR=~/.happy-platform-mcp/docs/servicenow
+HAPPY_DOCS_CACHE_DIR=~/.demoenvservicenowmcp/docs/servicenow
 HAPPY_DOCS_ENABLE_VECTOR=false
 HAPPY_DOCS_EMBEDDING_PROVIDER=none  # use local to enable deterministic local embeddings
 HAPPY_MCP_DOCS_ONLY=false
@@ -25,7 +25,7 @@ The same system properties can live in `config/servicenow-instances.json`:
 {
   "docs": {
     "localIndexEnabled": false,
-    "cacheDir": "~/.happy-platform-mcp/docs/servicenow",
+    "cacheDir": "~/.demoenvservicenowmcp/docs/servicenow",
     "enableVector": false,
     "embeddingProvider": "none"
   },

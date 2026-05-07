@@ -23,7 +23,7 @@ describe('docs config', () => {
   test('uses the default cache directory under the user home', () => {
     delete process.env.HAPPY_DOCS_CACHE_DIR;
     const config = getDocsConfig();
-    expect(config.cacheDir).toBe(path.join(os.homedir(), '.happy-platform-mcp', 'docs', 'servicenow'));
+    expect(config.cacheDir).toBe(path.join(os.homedir(), '.demoenvservicenowmcp', 'docs', 'servicenow'));
     expect(config.localIndexEnabled).toBe(false);
     expect(config.enableVector).toBe(false);
   });

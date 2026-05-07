@@ -84,7 +84,7 @@ describe('MCP Resources', () => {
     it('should read instance information', async () => {
       const instanceInfo = {
         server_info: {
-          name: 'Happy MCP Server (Consolidated)',
+          name: 'Demo Env ServiceNow MCP (Consolidated)',
           version: '2.0.0',
           description: 'Consolidated ServiceNow integration with metadata-driven schema lookups',
         },
@@ -119,7 +119,7 @@ describe('MCP Resources', () => {
 
     it('should include instance URL', async () => {
       const instanceInfo = {
-        server_info: { name: 'Happy MCP Server', version: '2.0.0' },
+        server_info: { name: 'Demo Env ServiceNow MCP', version: '2.0.0' },
         instance_info: { url: 'https://prod456.service-now.com' },
         capabilities: {},
       };

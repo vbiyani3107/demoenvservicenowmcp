@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Orchestrator: Setup Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #0b1121;
+            --surface-color: rgba(15, 23, 42, 0.6);
+            --surface-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #cbd5e1;
+            --accent-teal: #00A3A1;
+            --accent-blue: #003366;
+            --accent-glow: rgba(0, 163, 161, 0.5);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(0, 163, 161, 0.08), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(0, 51, 102, 0.15), transparent 25%);
+            background-attachment: fixed;
+        }
+
+        h1, h2, h3 { font-family: 'Outfit', sans-serif; font-weight: 800; }
+
+        header { padding: 60px 20px 40px; text-align: center; }
+        .title-glow {
+            font-size: 3rem;
+            background: linear-gradient(90deg, #fff, var(--accent-teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        .subtitle { font-size: 1.1rem; color: var(--text-muted); max-width: 600px; margin: 0 auto; }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 20px 80px; display: flex; flex-direction: column; gap: 30px; }
+
+        section {
+            background: var(--surface-color);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--surface-border);
+            border-radius: 16px;
+            padding: 35px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        section h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid var(--surface-border);
+            padding-bottom: 15px;
+            color: #fff;
+        }
+
+        section h2 i { color: var(--accent-teal); }
+
+        .step-list { list-style: none; counter-reset: custom-counter; }
+        .step-list li {
+            position: relative;
+            padding-left: 50px;
+            margin-bottom: 25px;
+            counter-increment: custom-counter;
+        }
+        .step-list li::before {
+            content: counter(custom-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 32px;
+            height: 32px;
+            background: var(--accent-teal);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-family: 'Outfit', sans-serif;
+        }
+        .step-list h3 { font-size: 1.2rem; margin-bottom: 8px; color: #fff; }
+        .step-list p { color: var(--text-muted); margin-bottom: 10px; }
+        .step-list a { color: #38bdf8; text-decoration: none; font-weight: bold; }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+            color: #a5b4fc;
+            white-space: pre-wrap;
+            border-left: 4px solid var(--accent-teal);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .alert-box {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid #ef4444;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+        .alert-box h4 { color: #fca5a5; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1 class="title-glow">Setup & Handoff Guide</h1>
+        <p class="subtitle">Complete step-by-step instructions for deploying the intelligent ServiceNow Demo Orchestrator to a new local machine.</p>
+    </header>
+
+    <div class="container">
+
+        <!-- Prerequisites -->
+        <section>
+            <h2><i class="fa-solid fa-list-check"></i> 1. Prerequisites</h2>
+            <ul class="step-list">
+                <li>
+                    <h3>Download Node.js</h3>
+                    <p>The MCP server requires Node.js to bridge the REST API. Download and install version 18 or higher from <a href="https://nodejs.org" target="_blank">nodejs.org</a>.</p>
+                </li>
+                <li>
+                    <h3>Download Claude/Cursor Desktop</h3>
+                    <p>You must use the local Desktop application for MCP support. Download it directly from <a href="https://claude.ai/download" target="_blank">claude.ai/download</a> (for Claude) or <a href="https://cursor.com" target="_blank">cursor.com</a> (for Cursor).</p>
+                </li>
+                <li>
+                    <h3>ServiceNow Access</h3>
+                    <p>You will need an active Developer Instance or Sub-Prod environment with <code>admin</code> privileges to deploy the backend script.</p>
+                </li>
+            </ul>
+        </section>
+
+        <!-- MCP Server -->
+        <section>
+            <h2><i class="fa-brands fa-node-js" style="color: #8b5cf6;"></i> 2. The Local MCP Server</h2>
+            <ul class="step-list">
+                <li>
+                    <h3>Clone the Repository</h3>
+                    <p>Clone the <strong>demoenvservicenowmcp</strong> source repository onto your local laptop (e.g. into your Documents folder):</p><div class="code-block">git clone https://github.com/vbiyani3107/demoenvservicenowmcp.git</div>
+                </li>
+                <li>
+                    <h3>Install Dependencies</h3>
+                    <p>Open your command line / terminal, navigate to the folder, and run the NPM install command:</p>
+                    <div class="code-block">npm install</div>
+                </li>
+                <li>
+                    <h3>Configure Credentials</h3>
+                    <p><strong>NEW STEP:</strong> Due to how Claude/Cursor routes MCP traffic, the local <code>.env</code> file is ignored. You <strong>MUST</strong> pass your credentials directly into the Claude/Cursor configuration file in the next step.</p>
+                </li>
+                <li>
+                    <h3>Configure Instances JSON</h3>
+                    <p>Open <code>config/servicenow-instances.json</code> and update the dev instance block with your target URL and credentials.</p>
+                    <div class="code-block">{
+  "instances": [
+    {
+      "name": "dev",
+      "url": "https://your-instance.service-now.com",
+      "username": "your_username",
+      "password": "your_password",
+      "default": true,
+      "description": "Development instance"
+    }
+  ]
+}</div>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Claude/Cursor Config -->
+        <section>
+            <h2><i class="fa-solid fa-robot" style="color: #d97757;"></i> 3. Claude/Cursor Configuration</h2>
+            <ul class="step-list">
+                <li>
+                    <h3>Locate the Configuration File</h3>
+                    <p><strong>For Claude:</strong> On Windows, open File Explorer and go to exactly this path:</p>
+                    <div class="code-block">%APPDATA%\Claude\claude_desktop_config.json</div>
+                    <p>(If on Mac, the path is <code>~/Library/Application Support/Claude/claude_desktop_config.json</code>)</p>
+                    <p><strong>For Cursor:</strong> The global MCP configuration file is located at:</p>
+                    <div class="code-block">~/.cursor/mcp.json</div>
+                    <p>(Or configure it per-project at <code>.cursor/mcp.json</code>, or via Cursor Settings &gt; Features &gt; MCP Servers)</p>
+                </li>
+                <li>
+                    <h3>Add the MCP Server Routing</h3>
+                    <p>Open that JSON file in a text editor like Notepad. Add the following object to map Claude/Cursor to our custom Node.js server.</p>
+                    <div class="code-block">{
+  "mcpServers": {
+    "servicenow-demo": {
+      "command": "node",
+      "args": [
+        "&lt;PATH_TO_HAPPY_PLATFORM_MCP&gt;\\src\\stdio-server.js"
+      ],
+      "env": {
+        "SERVICENOW_INSTANCE_URL": "https://&lt;YOUR_INSTANCE&gt;.service-now.com",
+        "SERVICENOW_USERNAME": "&lt;YOUR_USERNAME&gt;",
+        "SERVICENOW_PASSWORD": "&lt;YOUR_PASSWORD&gt;"
+      }
+    }
+  }
+}</div>
+                    <div class="alert-box" style="border-left-color: #3b82f6; background: rgba(59, 130, 246, 0.1);">
+                <h4 style="color: #93c5fd;"><i class="fa-solid fa-image"></i> A Quick Note on Client Logos</h4>
+                <p style="color: #bfdbfe; margin:0;">Client logos are now passed dynamically at runtime! When you prompt Claude/Cursor to deploy a demo, simply drag and drop the target client's logo directly into the Claude/Cursor chat window and ask Claude/Cursor to use it. Claude/Cursor will process the image into Base64 format and seamlessly inject it into the ServiceNow platform using the Orchestrator API.</p>
+            </div>
+                </li>
+                
+                <li>
+                    <h3>Restart Claude/Cursor</h3>
+                    <p>Close and reopen the Claude/Cursor Desktop Application. You should now see a small "plug" icon next to your text box, confirming you are connected to the ServiceNow Demo tools.</p>
+                </li>
+                <li>
+                    <h3><i class="fa-solid fa-check-circle" style="color: #10b981;"></i> Verify the Connection (Smoke Test)</h3>
+                    <p>Before moving on, verify that Claude/Cursor successfully connected by opening a new chat and simply typing:</p>
+                    <div class="code-block" style="border-left-color: #8b5cf6;">"List all available ServiceNow tools."</div>
+                    <p>If Claude/Cursor natively replies by listing the <code>SN-Deploy-Demo</code> tool, your bridge is active and working perfectly!</p>
+                </li>
+
+            </ul>
+        </section>
+
+        <!-- Architecture overview -->
+        <section>
+            <h2><i class="fa-solid fa-sitemap" style="color: #38bdf8;"></i> 4. How It Works (Hybrid Architecture)</h2>
+            <p style="color: var(--text-muted); margin-bottom: 18px;">The orchestrator is split across two runtimes so each side does what it's good at. You don't need to memorize this — but understanding it explains why deployment has two artifacts.</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px;">
+                <div style="background: rgba(0, 163, 161, 0.08); border: 1px solid rgba(0, 163, 161, 0.3); border-radius: 10px; padding: 18px;">
+                    <h3 style="color: var(--accent-teal); font-size: 1.1rem; margin-bottom: 10px;"><i class="fa-brands fa-node-js"></i>&nbsp; MCP server (Node, your laptop)</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 10px;">Owns orchestration, validation, idempotency. Talks to ServiceNow over REST.</p>
+                    <ul style="color: var(--text-muted); padding-left: 20px; font-size: 0.92rem;">
+                        <li>Users + role assignments</li>
+                        <li>Incidents (idempotent on correlation_id)</li>
+                        <li>Catalog categories, items, variables, choices</li>
+                        <li>Widget-instance title overrides</li>
+                        <li>Update-set wiring</li>
+                        <li>Also covers: dashboard widget injection, reports, HR cases, purchase orders, hero container background.</li>
+                    </ul>
+                </div>
+                <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 10px; padding: 18px;">
+                    <h3 style="color: #93c5fd; font-size: 1.1rem; margin-bottom: 10px;"><i class="fa-solid fa-cloud"></i>&nbsp; Script Include + Scripted REST (slim)</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 10px;">Owns only what genuinely needs Glide. Called by the MCP over HTTP.</p>
+                    <ul style="color: var(--text-muted); padding-left: 20px; font-size: 0.92rem;">
+                        <li><code>POST /api/global/demo_orchestrator/branding</code> — sp_theme CSS regex injection + base64 logo as sys_attachment</li>
+                        <li><code>POST /api/global/demo_orchestrator/revert</code> — bulk <code>deleteMultiple()</code> teardown across all demo tables (catalog, users, incidents, HR cases, POs, reports, sp_instance bindings) plus hero container reset</li>
+                    </ul>
+                </div>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.92rem; margin: 0 0 10px 0;"><strong style="color: #fff;">Why split?</strong> Bulk delete and CSS regex are dramatically faster as one server-side transaction than as N REST calls. Everything else is just as cheap (and far easier to debug) over REST.</p>
+            <p style="color: var(--text-muted); font-size: 0.92rem; margin: 0 0 6px 0;"><strong style="color: #fff;">Dashboard injection — first-column traversal:</strong> Instead of hardcoding <code>sys_id</code> references, the MCP traverses the portal layout dynamically:</p>
+            <ol style="color: var(--text-muted); font-size: 0.92rem; padding-left: 22px; margin: 0;">
+                <li>Queries <code>sp_page</code> where <code>id</code> is <code>index</code> (or whatever <code>pageId</code> the caller specifies).</li>
+                <li>Queries <code>sp_column</code> with <code>sp_row.sp_container.sp_page=&lt;page&gt;^ORDERBYorder</code>, <code>limit 1</code>, to find the primary content column (top order).</li>
+                <li>Creates an <code>sp_instance</code> record mapping the target widget (e.g. <code>demo_kpi_dashboard</code>) to that column. The <code>sp_widget</code> records themselves must already exist on the instance — Update Set / scoped app — the MCP only manages bindings.</li>
+            </ol>
+        </section>
+
+        <!-- ServiceNow Backend -->
+        <section>
+            <h2><i class="fa-solid fa-cloud"></i> 5. ServiceNow Backend (Script Include + Scripted REST API)</h2>
+            <ul class="step-list">
+                <li>
+                    <h3>One-shot deploy from your laptop (recommended)</h3>
+                    <p>The repo ships with <code>scripts/deploy_script_include.cjs</code>, which idempotently creates/updates the Script Include AND its companion Scripted REST API definition + 2 operations in a single run. The Script Include source it deploys lives at <code>servicenow/DemoOrchestratorAPI.js</code>. Credentials come from environment variables only — copy <code>.env.example</code> to <code>.env</code> and fill it in, or pass them inline:</p>
+                    <div class="code-block">SN_INSTANCE=your-instance.service-now.com \
+SN_USERNAME=admin \
+SN_PASSWORD='********' \
+node scripts/deploy_script_include.cjs</div>
+                    <p style="color: var(--text-muted); margin-top: 8px;">When it finishes you'll see the two endpoint URLs printed. That's all the ServiceNow-side setup the MCP needs.</p>
+                </li>
+                <li>
+                    <h3>Or: deploy manually via Claude/Cursor (no laptop script needed)</h3>
+                    <p>Click "Copy Prompt" below, paste it into your ServiceNow-connected Claude/Cursor chat. The prompt creates both the Script Include AND the Scripted REST API for you in one shot.</p>
+                    <div style="position: relative;">
+                        <button onclick="navigator.clipboard.writeText(document.getElementById('js-code').innerText); this.innerText='Copied!'; setTimeout(()=>this.innerText='Copy Prompt', 2000);" style="position: absolute; top: 10px; right: 10px; background: var(--accent-teal); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-family: 'Outfit'; font-weight: bold;">Copy Prompt</button>
+                        <div class="code-block" style="max-height: 400px; overflow-y: auto;" id="js-code">Please create the following two artifacts in my ServiceNow instance.
+
+ARTIFACT 1 — Script Include
+- Name: DemoOrchestratorAPI
+- Application Scope: Global
+- Client Callable: false
+- Active: true
+
+Use exactly this script body:
+
+var DemoOrchestratorAPI = Class.create();
+DemoOrchestratorAPI.prototype = {
+    initialize: function() {},
+
+    /**
+     * Apply visual branding to all Service Portals.
+     *
+     * @param {Object} demoConfig
+     *   {
+     *     clientName:        String  (used for logo file name)
+     *     primaryColor:      String  hex, default '#00A3A1'
+     *     secondaryColor:    String  hex, default '#003366'
+     *     navbarBgColor:     String? hex, defaults to secondaryColor
+     *     navbarTextColor:   String? hex, default '#ffffff'
+     *     logoUrl:           String? a pre-existing URL (skips upload)
+     *     logoBase64:        String? raw base64 payload (no data: prefix)
+     *     logoMimeType:      String? e.g. 'image/png' (default)
+     *   }
+     * @returns {Object} { ok, themesUpdated, logoSysId?, logoUrl?, errors[] }
+     */
+    applyBranding: function(demoConfig) {
+        var result = { ok: true, themesUpdated: 0, errors: [] };
+        if (!demoConfig) {
+            result.ok = false;
+            result.errors.push('demoConfig is required');
+            return result;
+        }
+
+        var primaryColor = demoConfig.primaryColor || '#00A3A1';
+        var secondaryColor = demoConfig.secondaryColor || '#003366';
+        var navBg = demoConfig.navbarBgColor || secondaryColor || primaryColor;
+        var navText = demoConfig.navbarTextColor || '#ffffff';
+        var finalLogoUrl = demoConfig.logoUrl || '';
+
+        // Tolerate the older widget contract where the whole data: URI is sent
+        // through logoUrl. Split it back into mime + base64 and route into the
+        // upload branch below.
+        if (finalLogoUrl.indexOf('data:image') === 0 && finalLogoUrl.indexOf('base64,') > -1) {
+            var parts = finalLogoUrl.split('base64,');
+            demoConfig.logoMimeType = parts[0].replace('data:', '').replace(/;\s*$/, '');
+            demoConfig.logoBase64 = parts[1];
+            finalLogoUrl = '';
+        }
+
+        if (!finalLogoUrl && demoConfig.logoBase64) {
+            try {
+                var mimeType = demoConfig.logoMimeType || 'image/png';
+                var extension = (mimeType.split('/')[1] || 'png').replace(/[^a-z0-9]/gi, '');
+                var safeClient = (demoConfig.clientName || 'demo').replace(/\s+/g, '_').toLowerCase();
+                var fileName = 'demo_logo_' + safeClient + '.' + extension;
+                var dummyPortal = new GlideRecord('sp_portal');
+                dummyPortal.query();
+                if (dummyPortal.next()) {
+                    var sa = new GlideSysAttachment();
+                    var attachSysId = sa.writeBase64(dummyPortal, fileName, mimeType, demoConfig.logoBase64);
+                    if (attachSysId) {
+                        finalLogoUrl = '/sys_attachment.do?sys_id=' + attachSysId;
+                        result.logoSysId = attachSysId;
+                        gs.info('[BRANDING] Stored Base64 upload as sys_attachment: ' + attachSysId);
+                    } else {
+                        result.errors.push('GlideSysAttachment.writeBase64 returned no sys_id');
+                    }
+                } else {
+                    result.errors.push('No sp_portal record found to host the logo attachment');
+                }
+            } catch (ex) {
+                result.errors.push('Base64 logo upload failed: ' + ex);
+            }
+        }
+        if (finalLogoUrl) result.logoUrl = finalLogoUrl;
+
+        var css = this._buildBrandingCss(finalLogoUrl, primaryColor, secondaryColor, navBg, navText);
+
+        var portalGR = new GlideRecord('sp_portal');
+        portalGR.query();
+        while (portalGR.next()) {
+            var themeSysId = portalGR.getValue('theme');
+            if (!themeSysId) continue;
+            var themeGR = new GlideRecord('sp_theme');
+            if (themeGR.get(themeSysId)) {
+                try {
+                    var current = themeGR.getValue('css_variables') || '';
+                    current = current.replace(
+                        /\/\* -- DEMO MASTER OVERRIDE -- \*\/[\s\S]*?\/\* -- END DEMO MASTER OVERRIDE -- \*\//g,
+                        ''
+                    );
+                    themeGR.setValue('css_variables', current + css);
+                    themeGR.update();
+                    result.themesUpdated++;
+                } catch (e) {
+                    result.errors.push('Theme update failed for ' + themeGR.getValue('name') + ': ' + e);
+                }
+            }
+        }
+
+        if (result.errors.length > 0) result.ok = false;
+        gs.info('[BRANDING] Branding applied. Themes updated: ' + result.themesUpdated);
+        return result;
+    },
+
+    _buildBrandingCss: function(finalLogoUrl, primaryColor, secondaryColor, navBg, navText) {
+        var logoBlock = '';
+        if (finalLogoUrl) {
+            logoBlock =
+                '.navbar-brand img, .sp-navbar-logo img, .navbar-logo img { display: none !important; }\n' +
+                '.navbar-brand, .sp-navbar-logo, .navbar-logo {\n' +
+                "    background-image: url('" + finalLogoUrl + "') !important;\n" +
+                '    background-size: contain !important;\n' +
+                '    background-repeat: no-repeat !important;\n' +
+                '    background-position: center left !important;\n' +
+                '    height: 50px !important;\n' +
+                '    width: 200px !important;\n' +
+                '    min-width: 200px !important;\n' +
+                '    display: block !important;\n' +
+                '}\n';
+        }
+
+        return (
+            '\n/* -- DEMO MASTER OVERRIDE -- */\n' +
+            logoBlock +
+            'a, .text-primary, .color-primary, .text-info, .panel-title a, .accordion-toggle, .sp-icon-link .fa, .announcement-title, .btn-link, button.btn-link {\n' +
+            '    color: ' + primaryColor + ' !important;\n' +
+            '}\n' +
+            '.bg-primary, .btn-primary, .icon-link-background-primary, .sn-va-widget-icon, .sn-connect-icon, .sp-chat-button, .sn-vabr_chat-btn {\n' +
+            '    background-color: ' + primaryColor + ' !important;\n' +
+            '    border-color: ' + primaryColor + ' !important;\n' +
+            '}\n' +
+            '.icon-link-background-primary { color: #fff !important; }\n' +
+            '.navbar, .navbar-inverse, .sp-navbar { background-color: ' + navBg + ' !important; }\n' +
+            '.navbar-inverse .navbar-nav > li > a, .navbar-inverse .navbar-brand { color: ' + navText + ' !important; transition: all 0.2s ease !important; }\n' +
+            '.navbar-inverse .navbar-nav > li > a:hover, .navbar-inverse .navbar-nav > li > a:focus, .navbar-inverse .navbar-brand:hover, .sp-navbar .navbar-nav > li > a:hover, .header-menu-item > a:hover { color: ' + primaryColor + ' !important; background-color: rgba(0,0,0,0.03) !important; }\n' +
+            '$brand-primary: ' + primaryColor + ';\n' +
+            '$brand-info: ' + primaryColor + ';\n' +
+            '$navbar-inverse-bg: ' + navBg + ';\n' +
+            '$navbar-inverse-link-color: ' + navText + ';\n' +
+            '$navbar-inverse-link-hover-color: ' + primaryColor + ';\n' +
+            '$link-color: ' + primaryColor + ';\n' +
+            '$sp-logo-margin-x: 15px;\n' +
+            ':root {\n' +
+            '    --now-color_brand--primary: ' + primaryColor + ';\n' +
+            '    --now-color_brand--secondary: ' + secondaryColor + ';\n' +
+            '    --now-color_chrome--brand: ' + primaryColor + ';\n' +
+            '    --now-color_chrome--divider: ' + primaryColor + ';\n' +
+            '}\n' +
+            '/* -- END DEMO MASTER OVERRIDE -- */\n'
+        );
+    },
+
+    /**
+     * Bulk teardown of all prefixed demo records and strip CSS overrides.
+     * Uses deleteMultiple() so the round-trip cost is one transaction per
+     * table instead of N REST DELETEs.
+     *
+     * @param {String} clientPrefix e.g. 'CompanyA'
+     * @returns {Object} {
+     *   ok,
+     *   deleted: { catalogItems, categories, users, incidents,
+     *              hrCases, purchaseOrders, reports, spInstances },
+     *   themesCleaned, heroContainersReset, errors[]
+     * }
+     */
+    revertByPrefix: function(clientPrefix) {
+        var result = {
+            ok: true,
+            deleted: {
+                catalogItems: 0,
+                categories: 0,
+                users: 0,
+                incidents: 0,
+                hrCases: 0,
+                purchaseOrders: 0,
+                reports: 0,
+                spInstances: 0
+            },
+            themesCleaned: 0,
+            heroContainersReset: 0,
+            errors: []
+        };
+        if (!clientPrefix) {
+            result.ok = false;
+            result.errors.push('clientPrefix is required');
+            return result;
+        }
+
+        gs.info('[TEARDOWN] Reverting demo data for: ' + clientPrefix);
+
+        try {
+            var itemGR = new GlideRecord('sc_cat_item');
+            itemGR.addQuery('name', 'STARTSWITH', clientPrefix + ' -');
+            itemGR.query();
+            result.deleted.catalogItems = itemGR.getRowCount();
+            itemGR.deleteMultiple();
+        } catch (e) { result.errors.push('Catalog items: ' + e); }
+
+        try {
+            var catGR = new GlideRecord('sc_category');
+            catGR.addQuery('title', 'STARTSWITH', clientPrefix + ' -');
+            catGR.query();
+            result.deleted.categories = catGR.getRowCount();
+            catGR.deleteMultiple();
+        } catch (e) { result.errors.push('Categories: ' + e); }
+
+        try {
+            var userPrefix = clientPrefix.split('-')[0].toLowerCase() + '_';
+            var userGR = new GlideRecord('sys_user');
+            userGR.addQuery('user_name', 'STARTSWITH', userPrefix);
+            userGR.query();
+            result.deleted.users = userGR.getRowCount();
+            userGR.deleteMultiple();
+        } catch (e) { result.errors.push('Users: ' + e); }
+
+        try {
+            var incGR = new GlideRecord('incident');
+            incGR.addQuery('correlation_id', 'STARTSWITH', clientPrefix + '_');
+            incGR.query();
+            result.deleted.incidents = incGR.getRowCount();
+            incGR.deleteMultiple();
+        } catch (e) { result.errors.push('Incidents: ' + e); }
+
+        // HR cases — table only exists when HRSD plugin is active. Wrap so a
+        // missing table reports a soft error instead of aborting the whole revert.
+        try {
+            var hrcGR = new GlideRecord('sn_hr_core_case');
+            if (hrcGR.isValid()) {
+                hrcGR.addQuery('correlation_id', 'STARTSWITH', clientPrefix + '_hrc_');
+                hrcGR.query();
+                result.deleted.hrCases = hrcGR.getRowCount();
+                hrcGR.deleteMultiple();
+            }
+        } catch (e) { result.errors.push('HR cases: ' + e); }
+
+        // Purchase orders — Procurement plugin gated, same pattern as HR cases.
+        try {
+            var poGR = new GlideRecord('proc_po');
+            if (poGR.isValid()) {
+                poGR.addQuery('correlation_id', 'STARTSWITH', clientPrefix + '_po_');
+                poGR.query();
+                result.deleted.purchaseOrders = poGR.getRowCount();
+                poGR.deleteMultiple();
+            }
+        } catch (e) { result.errors.push('Purchase orders: ' + e); }
+
+        try {
+            var rptGR = new GlideRecord('sys_report');
+            rptGR.addQuery('title', 'STARTSWITH', clientPrefix + ' -');
+            rptGR.query();
+            result.deleted.reports = rptGR.getRowCount();
+            rptGR.deleteMultiple();
+        } catch (e) { result.errors.push('Reports: ' + e); }
+
+        // Service Portal widget instances created by SN-Demo-Apply-Dashboard
+        // are stamped with class_name='demo-<clientPrefix>' (the real
+        // Bootstrap-class hook on sp_instance — sp_instance has NO css_class
+        // field; addQuery on a missing field silently no-ops and would delete
+        // the entire table). We sweep by exact prefix on class_name.
+        try {
+            var spiGR = new GlideRecord('sp_instance');
+            spiGR.addQuery('class_name', 'STARTSWITH', 'demo-' + clientPrefix);
+            spiGR.query();
+            result.deleted.spInstances = spiGR.getRowCount();
+            spiGR.deleteMultiple();
+        } catch (e) { result.errors.push('Widget instances: ' + e); }
+
+        try {
+            var portalGR = new GlideRecord('sp_portal');
+            portalGR.query();
+            while (portalGR.next()) {
+                var themeSysId = portalGR.getValue('theme');
+                if (!themeSysId) continue;
+                var themeGR = new GlideRecord('sp_theme');
+                if (themeGR.get(themeSysId)) {
+                    var currentCss = themeGR.getValue('css_variables') || '';
+                    var cleanedCss = currentCss.replace(
+                        /\/\* -- DEMO MASTER OVERRIDE -- \*\/[\s\S]*?\/\* -- END DEMO MASTER OVERRIDE -- \*\//g,
+                        ''
+                    );
+                    if (cleanedCss !== currentCss) {
+                        themeGR.setValue('css_variables', cleanedCss);
+                        themeGR.update();
+                        result.themesCleaned++;
+                    }
+                }
+            }
+        } catch (e) { result.errors.push('Theme cleanup: ' + e); }
+
+        // Hero container background — restore to empty for the index page's first
+        // container. We deliberately do NOT hard-code an instance-specific stock
+        // sys_id; '' is the safe, portable default.
+        try {
+            var pageGR = new GlideRecord('sp_page');
+            pageGR.addQuery('id', 'index');
+            pageGR.query();
+            while (pageGR.next()) {
+                var contGR = new GlideRecord('sp_container');
+                contGR.addQuery('sp_row.sp_page', pageGR.getUniqueValue());
+                contGR.orderBy('order');
+                contGR.setLimit(1);
+                contGR.query();
+                if (contGR.next()) {
+                    var bgImg = contGR.getValue('background_image') || '';
+                    var bgColor = contGR.getValue('background_color') || '';
+                    if (bgImg || bgColor) {
+                        contGR.setValue('background_image', '');
+                        contGR.setValue('background_color', '');
+                        contGR.update();
+                        result.heroContainersReset++;
+                    }
+                }
+            }
+        } catch (e) { result.errors.push('Hero container reset: ' + e); }
+
+        if (result.errors.length > 0) result.ok = false;
+        gs.info('[TEARDOWN] Complete for ' + clientPrefix + '. Deleted: ' + JSON.stringify(result.deleted));
+        return result;
+    },
+
+    type: 'DemoOrchestratorAPI'
+};
+
+ARTIFACT 2 — Scripted REST API
+- Name: Demo Orchestrator
+- API ID: demo_orchestrator
+- Active: true
+- Consumes / Produces: application/json
+
+With these two POST resources (both authenticated, no ACL):
+
+Resource A — applyBranding
+- HTTP method: POST
+- Relative path: /branding
+- Operation script:
+
+(function process(request, response) {
+    try {
+        var body = request.body && request.body.data ? request.body.data : {};
+        var api = new DemoOrchestratorAPI();
+        var result = api.applyBranding(body);
+        response.setStatus(result && result.ok === false ? 207 : 200);
+        response.setContentType('application/json');
+        response.setBody(result);
+    } catch (e) {
+        response.setStatus(500);
+        response.setContentType('application/json');
+        response.setBody({ ok: false, error: String(e) });
+    }
+})(request, response);
+
+Resource B — revertByPrefix
+- HTTP method: POST
+- Relative path: /revert
+- Operation script:
+
+(function process(request, response) {
+    try {
+        var body = request.body && request.body.data ? request.body.data : {};
+        var prefix = body.clientPrefix || body.prefix || '';
+        var api = new DemoOrchestratorAPI();
+        var result = api.revertByPrefix(prefix);
+        response.setStatus(result && result.ok === false ? 207 : 200);
+        response.setContentType('application/json');
+        response.setBody(result);
+    } catch (e) {
+        response.setStatus(500);
+        response.setContentType('application/json');
+        response.setBody({ ok: false, error: String(e) });
+    }
+})(request, response);
+
+When you're done, the MCP server will be able to call:
+  POST https://&lt;your-instance&gt;/api/global/demo_orchestrator/branding
+  POST https://&lt;your-instance&gt;/api/global/demo_orchestrator/revert
+</div>
+                    </div>
+                </li>
+
+            </ul>
+        </section>
+
+        
+        <!-- The Prompt -->
+        <section>
+            <h2><i class="fa-solid fa-play" style="color: #10b981;"></i> 6. Running the Engine</h2>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">Your environment is now completely configured! You don't need any coding skills to run this. To create a massive, customized demo environment in seconds, you just ask Claude/Cursor to do it.</p>
+
+            <details style="margin-bottom: 20px; background: rgba(255,255,255,0.03); border: 1px solid var(--surface-border); border-radius: 8px; padding: 12px 16px;">
+                <summary style="cursor: pointer; color: var(--text-main); font-family: 'Outfit'; font-weight: 600;">Available demo tools</summary>
+                <div style="color: var(--text-muted); font-size: 0.92rem; margin-top: 12px;">
+                    <p style="margin-bottom: 6px;"><strong style="color: #fff;"><code>SN-Deploy-Demo</code></strong> — one-call umbrella. Composes everything below in a single payload. Use this 95% of the time.</p>
+                    <p style="margin-bottom: 6px;">For surgical edits Claude can also call any of these directly:</p>
+                    <ul style="padding-left: 20px;">
+                        <li><code>SN-Demo-Apply-Branding</code> — visual branding (CSS + base64 logo + optional hero container background)</li>
+                        <li><code>SN-Demo-Apply-Personas</code> — users + roles</li>
+                        <li><code>SN-Demo-Apply-Data</code> — incidents, plus optional HR cases (sn_hr_core_case) and purchase orders (proc_po), plugin-gated</li>
+                        <li><code>SN-Demo-Apply-Catalog</code> — categories + catalog items + variables + choices</li>
+                        <li><code>SN-Demo-Apply-Widget-Overrides</code> — relabel sp_instance widget titles</li>
+                        <li><code>SN-Demo-Apply-Reports</code> — sys_report rows used by demo dashboards (idempotent on title)</li>
+                        <li><code>SN-Demo-Apply-Dashboard</code> — bind existing <code>sp_widget</code> records to the index page's first column as <code>sp_instance</code> rows; clientPrefix-stamped for clean revert</li>
+                        <li><code>SN-Demo-Revert</code> — bulk teardown by clientPrefix (server-side <code>deleteMultiple()</code>)</li>
+                    </ul>
+                </div>
+            </details>
+            
+            <div class="alert-box" style="border-left-color: #3b82f6; background: rgba(59, 130, 246, 0.1);">
+                <h4 style="color: #93c5fd;"><i class="fa-solid fa-image"></i> A Quick Note on Client Logos</h4>
+                <p style="color: #bfdbfe; margin:0;">For standard demos (CompanyA, CompanyB, CompanyC), the logos are already pre-loaded in the engine! However, if you are pitching to a <strong>Brand New Client</strong>, simply drag and drop their logo image directly into the Claude/Cursor chat window before you hit enter. Claude/Cursor will automatically grab it and inject it into ServiceNow for you!</p>
+            </div>
+
+            <br>
+            <h3><i class="fa-solid fa-bolt" style="color: #10b981;"></i> Option A: The Easy One-Liner (Recommended)</h3>
+            <p style="color: var(--text-muted); margin-bottom: 10px;">No JSON, no schema, no brackets to fill in. Just describe the client and industry in plain English and let the AI figure out the rest. Perfect for live calls when you need a demo seeded in seconds.</p>
+            <div style="position: relative;">
+                <button onclick="navigator.clipboard.writeText(document.getElementById('easy-prompt').innerText); this.innerText='Copied!'; setTimeout(()=>this.innerText='Copy Prompt', 2000);" style="position: absolute; top: 10px; right: 10px; background: #10b981; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-family: 'Outfit'; font-weight: bold;">Copy Prompt</button>
+                <div class="code-block" style="border-left-color: #10b981; font-size: 1rem;" id="easy-prompt">Set up a ServiceNow demo for [CLIENT NAME] — a [SHORT INDUSTRY DESCRIPTION] org. Generate realistic categories, catalog items, at least 2 users, and a handful of incidents.</div>
+            </div>
+            <p style="color: var(--text-muted); margin-top: 10px; margin-bottom: 10px;"><strong style="color: #10b981;">Live example</strong> — what was actually used to seed the current CompanyA Healthcare demo:</p>
+            <div style="position: relative;">
+                <button onclick="navigator.clipboard.writeText(document.getElementById('easy-prompt-example').innerText); this.innerText='Copied!'; setTimeout(()=>this.innerText='Copy Prompt', 2000);" style="position: absolute; top: 10px; right: 10px; background: #10b981; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-family: 'Outfit'; font-weight: bold;">Copy Prompt</button>
+                <div class="code-block" style="border-left-color: #10b981; font-size: 1rem;" id="easy-prompt-example">Set up a ServiceNow demo for CompanyA Healthcare — a hospital IT operations org. Generate realistic categories, catalog items, at least 2 users, and a handful of incidents.</div>
+            </div>
+
+            <br>
+            <h3><i class="fa-solid fa-sliders" style="color: #f59e0b;"></i> Option B: The Master Template (Power User)</h3>
+            <p style="color: var(--text-muted); margin-bottom: 10px;">Use this when you need full control — explicit brand colors, exact prefixes, or a strict JSON schema. Change the capitalized words in brackets to match your client. <br><strong style="color: #f59e0b;">Tip:</strong> This prompt asks the AI to be "creative" with the dummy data, but you can always modify the end of this prompt to dictate exactly what kind of specific incidents, descriptions, or users you want it to generate to your exact liking!</p>
+            <div class="code-block" style="border-left-color: #f59e0b;">"You are orchestrating a ServiceNow demo for [CLIENT NAME] in the [INDUSTRY] industry. You must orchestrate this entirely using the SN-Deploy-Demo tool. Construct a single JSON payload string matching this exact schema: {"clientName":"[CLIENT NAME]", "clientPrefix":"[SHORT PREFIX]", "primaryColor":"[HEX CODE]", "secondaryColor":"[HEX CODE]", "heroBackgroundColor":"[HEX CODE]", "categories":[{"name":"category title", "description":"..."}], "catalogItems":[{"name":"item name", "category":"category title", "short_description":"..."}], "users":[{"first_name":"...", "last_name":"...", "user_name":"...", "email":"...", "title":"..."}], "incidents":[{"short_description":"...", "description":"...", "category":"software", "correlation_id":"[PREFIX]_inc_1"}], "hr_cases":[{"short_description":"...", "correlation_id":"[PREFIX]_hrc_1"}], "purchase_orders":[{"short_description":"...", "total_cost":"100", "correlation_id":"[PREFIX]_po_1"}], "reports":[{"title":"[PREFIX] - Open Incidents by Category", "table":"incident", "type":"donut", "field":"category"}], "dashboard":{"pageId":"index", "widgets":[{"id":"demo_kpi_dashboard", "order":100}]}}. Fill out this schema creatively mimicking their real-world industry and generate at least 2 users. The hr_cases / purchase_orders / dashboard / reports keys are optional — include them only if the client demo calls for HRSD, Procurement, or a portal KPI panel. Pass the minified JSON string as the payload argument to SN-Deploy-Demo. Do not use any other tools."</div>
+
+            <br>
+            <h3>Example: The CompanyA Demo Prompt</h3>
+            <p style="color: var(--text-muted); margin-bottom: 10px;">Here is exactly what it looks like when filled out for CompanyA. You can copy/paste this right now to test your system!</p>
+            <div style="position: relative;">
+                <button onclick="navigator.clipboard.writeText(document.getElementById('companya-prompt').innerText); this.innerText='Copied!'; setTimeout(()=>this.innerText='Copy Prompt', 2000);" style="position: absolute; top: 10px; right: 10px; background: #10b981; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-family: 'Outfit'; font-weight: bold;">Copy Prompt</button>
+                <div class="code-block" style="border-left-color: #10b981; font-size: 1rem;" id="companya-prompt">"You are orchestrating a ServiceNow demo for CompanyA Healthcare. You must orchestrate this entirely using the SN-Deploy-Demo tool. Construct a single JSON payload string matching this exact schema: {"clientName":"CompanyA", "clientPrefix":"CompanyA", "primaryColor":"#00A3A1", "secondaryColor":"#003366", "categories":[{"name":"category title", "description":"..."}], "catalogItems":[{"name":"item name", "category":"category title", "short_description":"..."}], "users":[{"first_name":"...", "last_name":"...", "user_name":"...", "email":"...", "title":"..."}], "incidents":[{"short_description":"...", "description":"...", "category":"software", "correlation_id":"..."}]}. Fill out this schema creatively mimicking their real-world industry (Healthcare / Hospital IT Operations) and generate at least 2 users. Pass the minified JSON string as the payload argument to SN-Deploy-Demo. Do not use any other tools."</div>
+            </div>
+
+            <br>
+            <h3><i class="fa-solid fa-chart-pie" style="color: #38bdf8;"></i> Surgical: Add a KPI Dashboard to an Existing Demo</h3>
+            <p style="color: var(--text-muted); margin-bottom: 10px;">If the demo is already deployed and you just want to attach an existing widget (already on the instance via Update Set) to the portal's first column, call <code>SN-Demo-Apply-Dashboard</code> directly. It's idempotent on <code>(sp_column, sp_widget)</code>, so re-running is a no-op. Pass <code>clientPrefix</code> so <code>SN-Demo-Revert</code> can sweep the binding later.</p>
+            <div style="position: relative;">
+                <button onclick="navigator.clipboard.writeText(document.getElementById('dashboard-prompt').innerText); this.innerText='Copied!'; setTimeout(()=>this.innerText='Copy Prompt', 2000);" style="position: absolute; top: 10px; right: 10px; background: #38bdf8; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-family: 'Outfit'; font-weight: bold;">Copy Prompt</button>
+                <div class="code-block" style="border-left-color: #38bdf8; font-size: 1rem;" id="dashboard-prompt">Add a KPI dashboard to the [CLIENT PREFIX] demo. Call SN-Demo-Apply-Dashboard with { "pageId": "index", "clientPrefix": "[CLIENT PREFIX]", "widgets": [{ "id": "demo_kpi_dashboard", "order": 100, "title": "[CLIENT NAME] KPIs" }] }. Report which widgets were bound, which were already bound (idempotent skip), and which sp_widget ids could not be found on the instance.</div>
+            </div>
+
+            <br>
+            <h3><i class="fa-solid fa-rotate-left" style="color: #ef4444;"></i> Option C: Reverting a Demo</h3>
+            <p style="color: var(--text-muted); margin-bottom: 10px;">Wiping a client demo is a one-liner too. The Script Include's <code>revertByPrefix()</code> uses <code>deleteMultiple()</code> server-side, so even a 200-record demo collapses in under a second — including stripping the master CSS override from every Service Portal theme.</p>
+            <div style="position: relative;">
+                <button onclick="navigator.clipboard.writeText(document.getElementById('revert-prompt').innerText); this.innerText='Copied!'; setTimeout(()=>this.innerText='Copy Prompt', 2000);" style="position: absolute; top: 10px; right: 10px; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-family: 'Outfit'; font-weight: bold;">Copy Prompt</button>
+                <div class="code-block" style="border-left-color: #ef4444; font-size: 1rem;" id="revert-prompt">Revert the [CLIENT PREFIX] demo by calling SN-Demo-Revert with that clientPrefix.</div>
+            </div>
+        </section>
+
+
+    </div>
+</body>
+</html>

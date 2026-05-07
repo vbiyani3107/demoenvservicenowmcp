@@ -214,8 +214,8 @@ Documented in `/src/natural-language.js`:
 
 ## File Locations
 
-- **Parser**: `/Users/nczitzer/WebstormProjects/mcp-servicenow-nodejs/src/natural-language.js`
-- **MCP Server**: `/Users/nczitzer/WebstormProjects/mcp-servicenow-nodejs/src/mcp-server-consolidated.js`
+- **Parser**: `/path/to/demoenvservicenowmcp/src/natural-language.js`
+- **MCP Server**: `/path/to/demoenvservicenowmcp/src/mcp-server-consolidated.js`
   - Import added at line 7
   - Tool definition to add after line 514
   - Handler to add after line 1117

@@ -1,7 +1,7 @@
 /**
- * Happy MCP Server - Script Synchronization
+ * Demo Env ServiceNow MCP - Script Synchronization
  *
- * Copyright (c) 2025 Happy Technologies LLC
+ * Copyright (c) 2025 Vinay Kumar Biyani
  * Licensed under the MIT License - see LICENSE file for details
  *
  * Enables local script development with Git integration.

@@ -1,6 +1,6 @@
-# Contributing to Happy MCP Server
+# Contributing to Demo Env ServiceNow MCP
 
-Thank you for your interest in contributing! This document provides guidelines for contributing to the Happy MCP Server project.
+Thank you for your interest in contributing! This document provides guidelines for contributing to this project.
 
 ## Code of Conduct
 
@@ -10,7 +10,7 @@ Be respectful and constructive. We want this to be a welcoming community for eve
 
 ### Reporting Bugs
 
-1. Check [existing issues](https://github.com/Happy-Technologies-LLC/mcp-servicenow-nodejs/issues) to avoid duplicates.
+1. Check [existing issues](https://github.com/vbiyani3107/demoenvservicenowmcp/issues) to avoid duplicates.
 2. Open a new issue with:
    - A clear title and description
    - Steps to reproduce
@@ -47,9 +47,9 @@ Open an issue with the `enhancement` label. Describe:
 By submitting a pull request, you agree that:
 
 1. You have the right to submit the contribution under the project's Apache 2.0 license.
-2. You grant Happy Technologies LLC a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable license to use, reproduce, modify, display, perform, sublicense, and distribute your contribution as part of this project.
+2. You grant the project maintainers a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable license to use, reproduce, modify, display, perform, sublicense, and distribute your contribution as part of this project.
 3. You represent that your contribution is your original work, or you have the right to submit it.
-4. You understand that your contribution will be licensed under the Apache License 2.0 and may be redistributed by Happy Technologies LLC and others.
+4. You understand that your contribution will be licensed under the Apache License 2.0 and may be redistributed by the project maintainers and others.
 
 **To sign the CLA:** Add the following statement to your first pull request description:
 
@@ -69,8 +69,8 @@ If you are contributing on behalf of your employer, please ensure you have autho
 
 ```bash
 # Clone your fork
-git clone https://github.com/YOUR_USERNAME/mcp-servicenow-nodejs.git
-cd mcp-servicenow-nodejs
+git clone https://github.com/YOUR_USERNAME/demoenvservicenowmcp.git
+cd demoenvservicenowmcp
 
 # Install dependencies
 npm install
@@ -99,11 +99,11 @@ npm test
 When writing documentation or comments, please follow these guidelines:
 - Use "ServiceNow®" (with ® symbol) on first reference per document.
 - Do not use "ServiceNow" in feature names, tool names, or branding.
-- Refer to this project as "Happy MCP Server," not "ServiceNow MCP Server."
+- Refer to this project as "Demo Env ServiceNow MCP," not "ServiceNow MCP Server."
 
 ## Questions?
 
-Open a [discussion](https://github.com/Happy-Technologies-LLC/mcp-servicenow-nodejs/discussions) or reach out via the issue tracker.
+Open a [discussion](https://github.com/vbiyani3107/demoenvservicenowmcp/discussions) or reach out via the issue tracker.
 
 ## License
 

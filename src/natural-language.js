@@ -1,7 +1,7 @@
 /**
- * Happy MCP Server - Natural Language Query Processing
+ * Demo Env ServiceNow MCP - Natural Language Query Processing
  *
- * Copyright (c) 2025 Happy Technologies LLC
+ * Copyright (c) 2025 Vinay Kumar Biyani
  * Licensed under the MIT License - see LICENSE file for details
  *
  * Natural Language to ServiceNow Encoded Query Parser

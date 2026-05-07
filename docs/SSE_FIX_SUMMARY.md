@@ -58,7 +58,7 @@ docker run -d \
   -e SERVICENOW_INSTANCE_URL=https://dev12345.service-now.com \
   -e SERVICENOW_USERNAME=admin \
   -e SERVICENOW_PASSWORD=password \
-  nczitzer/mcp-servicenow-nodejs:latest
+  vbiyani3107/demoenvservicenowmcp:latest
 ```
 
 ### Test Connection
@@ -264,7 +264,7 @@ All 183 tests pass:
 
 ## Next Steps
 
-1. Pull latest image: `docker pull nczitzer/mcp-servicenow-nodejs:latest`
+1. Pull latest image: `docker pull vbiyani3107/demoenvservicenowmcp:latest`
 2. Update deployment with new environment variable (optional)
 3. Test SSE connection: `curl -N http://localhost:3000/mcp`
 4. Monitor logs for keepalive messages
@@ -273,5 +273,5 @@ All 183 tests pass:
 ---
 
 **Full Documentation:** `docs/SSE_DOCKER_SETUP.md`
-**GitHub:** https://github.com/Happy-Technologies-LLC/mcp-servicenow-nodejs
+**GitHub:** https://github.com/vbiyani3107/demoenvservicenowmcp
 **npm:** https://www.npmjs.com/package/servicenow-mcp-server

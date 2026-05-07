@@ -1,6 +1,6 @@
-# Happy MCP Server - Docker Image
+# Demo Env ServiceNow MCP - Docker Image
 # Model Context Protocol Server for the ServiceNow Platform
-# Copyright 2025 Happy Technologies LLC
+# Copyright 2025 Vinay Kumar Biyani
 # Licensed under Apache License 2.0
 
 # Stage 1: Dependencies

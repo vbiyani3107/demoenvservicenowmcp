@@ -77,7 +77,7 @@ In your Claude Desktop configuration:
     "servicenow": {
       "command": "node",
       "args": ["src/stdio-server.js"],
-      "cwd": "/path/to/mcp-servicenow-nodejs",
+      "cwd": "/path/to/demoenvservicenowmcp",
       "env": {
         "SERVICENOW_INSTANCE": "dev"
       }

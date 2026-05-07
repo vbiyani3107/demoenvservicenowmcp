@@ -1,12 +1,12 @@
 version: '3.8'
 
 services:
-  happy-platform-mcp:
-    image: nczitzer/happy-platform-mcp:latest
+  demoenvservicenowmcp:
+    image: vbiyani3107/demoenvservicenowmcp:latest
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: happy-platform-mcp
+    container_name: demoenvservicenowmcp
     ports:
       - "3000:3000"
     environment:

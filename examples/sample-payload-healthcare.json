@@ -1,0 +1,146 @@
+{
+  "_comment": "Reference payload for SN-Deploy-Demo. Industry: Healthcare / Hospital IT Operations. Use this as a known-good shape and a few-shot example when generating payloads for other industries. Pass this object's JSON-stringified form as the `payload` argument.",
+  "clientName": "CompanyA Healthcare",
+  "clientPrefix": "CompanyA",
+  "primaryColor": "#00A3A1",
+  "secondaryColor": "#003366",
+  "categories": [
+    {
+      "name": "Clinical Systems",
+      "description": "Support for EHR, EMR, PACS, and other clinical applications used by physicians, nurses, and allied health staff."
+    },
+    {
+      "name": "Medical Devices & IoT",
+      "description": "Connected medical devices, infusion pumps, patient monitors, and biomedical equipment integrations."
+    },
+    {
+      "name": "Patient Portal & Telehealth",
+      "description": "Patient-facing portal access, telehealth video platform, and virtual visit support."
+    },
+    {
+      "name": "HIPAA & Compliance",
+      "description": "Privacy, security, audit, and HIPAA compliance-related requests for protected health information."
+    },
+    {
+      "name": "Pharmacy & Lab Systems",
+      "description": "Pharmacy management, e-prescribing, laboratory information systems, and order entry."
+    }
+  ],
+  "catalogItems": [
+    {
+      "name": "New Clinician EHR Access",
+      "category": "Clinical Systems",
+      "short_description": "Provision Epic/Cerner EHR account with role-based access for new physicians, nurses, or residents."
+    },
+    {
+      "name": "PACS Imaging Workstation Request",
+      "category": "Clinical Systems",
+      "short_description": "Request a radiology PACS workstation with diagnostic-grade monitors and DICOM viewer access."
+    },
+    {
+      "name": "Biomedical Device Onboarding",
+      "category": "Medical Devices & IoT",
+      "short_description": "Register and network-onboard a new medical device (infusion pump, patient monitor, ventilator) on the clinical VLAN."
+    },
+    {
+      "name": "Telehealth Video Platform Setup",
+      "category": "Patient Portal & Telehealth",
+      "short_description": "Configure a provider account on the telehealth platform for virtual patient visits."
+    },
+    {
+      "name": "Patient Portal Account Reset",
+      "category": "Patient Portal & Telehealth",
+      "short_description": "Reset patient MyChart/portal credentials and verify identity per HIPAA guidelines."
+    },
+    {
+      "name": "PHI Access Audit Request",
+      "category": "HIPAA & Compliance",
+      "short_description": "Request an audit report of PHI access for a specific patient record or user."
+    },
+    {
+      "name": "E-Prescribing (EPCS) Token Request",
+      "category": "Pharmacy & Lab Systems",
+      "short_description": "Issue a DEA EPCS hard/soft token for controlled substance e-prescribing."
+    },
+    {
+      "name": "Lab Interface Connectivity Request",
+      "category": "Pharmacy & Lab Systems",
+      "short_description": "Establish HL7 interface between LIS and a new reference laboratory or clinic."
+    }
+  ],
+  "users": [
+    {
+      "first_name": "Sarah",
+      "last_name": "Chen",
+      "user_name": "sarah.chen",
+      "email": "sarah.chen@companya-health.org",
+      "title": "Chief Medical Information Officer"
+    },
+    {
+      "first_name": "Marcus",
+      "last_name": "Okonkwo",
+      "user_name": "marcus.okonkwo",
+      "email": "marcus.okonkwo@companya-health.org",
+      "title": "Director of Hospital IT Operations"
+    },
+    {
+      "first_name": "Priya",
+      "last_name": "Raman",
+      "user_name": "priya.raman",
+      "email": "priya.raman@companya-health.org",
+      "title": "Epic EHR Application Analyst"
+    },
+    {
+      "first_name": "Elena",
+      "last_name": "Vasquez",
+      "user_name": "elena.vasquez",
+      "email": "elena.vasquez@companya-health.org",
+      "title": "Biomedical Engineering Lead"
+    },
+    {
+      "first_name": "James",
+      "last_name": "OBrien",
+      "user_name": "james.obrien",
+      "email": "james.obrien@companya-health.org",
+      "title": "HIPAA Security & Compliance Officer"
+    }
+  ],
+  "incidents": [
+    {
+      "short_description": "Epic EHR slow response in ED during shift change",
+      "description": "Emergency Department clinicians reporting 10-15 second delays loading patient charts in Epic Hyperspace between 06:45-07:30 during shift change. Impacting triage and order entry. Suspect Citrix session pool saturation.",
+      "category": "software",
+      "correlation_id": "CompanyA-INC-EHR-001"
+    },
+    {
+      "short_description": "PACS workstation unable to retrieve prior imaging studies",
+      "description": "Radiologist workstation in Reading Room 3 cannot pull prior CT/MRI studies from PACS archive. Current studies load normally; only studies older than 90 days fail with DICOM C-MOVE timeout.",
+      "category": "software",
+      "correlation_id": "CompanyA-INC-PACS-002"
+    },
+    {
+      "short_description": "Infusion pump fleet offline from clinical VLAN",
+      "description": "Approximately 40 BD Alaris infusion pumps on Tower B, floors 4-6 lost connectivity to the medication library server. Pumps operating in standalone mode. Biomedical and Network teams engaged.",
+      "category": "network",
+      "correlation_id": "CompanyA-INC-BIOMED-003"
+    },
+    {
+      "short_description": "Telehealth video sessions dropping mid-visit",
+      "description": "Multiple providers report telehealth video calls disconnecting after 8-12 minutes. Audio remains, video freezes. Affecting outpatient behavioral health and primary care virtual visits.",
+      "category": "network",
+      "correlation_id": "CompanyA-INC-TELE-004"
+    },
+    {
+      "short_description": "Pharmacy e-prescribing failing for controlled substances",
+      "description": "EPCS controlled substance prescriptions failing to transmit to Surescripts. Non-controlled prescriptions transmitting normally. Suspected DEA token signing certificate expiration.",
+      "category": "software",
+      "correlation_id": "CompanyA-INC-PHARM-005"
+    },
+    {
+      "short_description": "Unauthorized PHI access alert - VIP patient record",
+      "description": "Splunk SIEM triggered HIPAA break-the-glass alert for VIP patient record accessed by user outside care team. Compliance investigation initiated under HIPAA Privacy Rule.",
+      "category": "security",
+      "correlation_id": "CompanyA-INC-HIPAA-006"
+    }
+  ]
+}

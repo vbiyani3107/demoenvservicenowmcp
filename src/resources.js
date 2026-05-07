@@ -1,7 +1,7 @@
 /**
- * Happy MCP Server - MCP Resources Implementation
+ * Demo Env ServiceNow MCP - MCP Resources Implementation
  *
- * Copyright (c) 2025 Happy Technologies LLC
+ * Copyright (c) 2025 Vinay Kumar Biyani
  * Licensed under the MIT License - see LICENSE file for details
  *
  * Provides read-only, cacheable access to ServiceNow data
@@ -190,7 +190,7 @@ export function createResourceHandlers(serviceNowClient, configManager, tableMet
             default: instanceConfig.default || false
           },
           server_info: {
-            name: 'Happy MCP Server',
+            name: 'Demo Env ServiceNow MCP',
             version: '2.0.0',
             description: 'Multi-instance ServiceNow MCP server with resources'
           },

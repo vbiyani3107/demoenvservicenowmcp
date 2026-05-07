@@ -15,8 +15,8 @@ Your Claude Desktop is configured with **Option A: Multi-Instance with Runtime S
   "mcpServers": {
     "servicenow-nodejs": {
       "command": "node",
-      "args": ["/Users/nczitzer/WebstormProjects/mcp-servicenow-nodejs/src/stdio-server.js"],
-      "cwd": "/Users/nczitzer/WebstormProjects/mcp-servicenow-nodejs"
+      "args": ["/path/to/demoenvservicenowmcp/src/stdio-server.js"],
+      "cwd": "/path/to/demoenvservicenowmcp"
     }
   }
 }
@@ -48,7 +48,7 @@ nano ~/Library/Application\ Support/Claude/claude_desktop_config.json
 
 **Step 1:** Create `config/servicenow-instances.json`:
 ```bash
-cd /Users/YOUR_USERNAME/WebstormProjects/mcp-servicenow-nodejs
+cd /path/to/demoenvservicenowmcp
 nano config/servicenow-instances.json
 ```
 
@@ -72,8 +72,8 @@ nano config/servicenow-instances.json
   "mcpServers": {
     "servicenow-nodejs": {
       "command": "node",
-      "args": ["/Users/YOUR_USERNAME/WebstormProjects/mcp-servicenow-nodejs/src/stdio-server.js"],
-      "cwd": "/Users/YOUR_USERNAME/WebstormProjects/mcp-servicenow-nodejs"
+      "args": ["/path/to/demoenvservicenowmcp/src/stdio-server.js"],
+      "cwd": "/path/to/demoenvservicenowmcp"
     }
   }
 }
@@ -91,8 +91,8 @@ Add to Claude Desktop config (WITH env section):
   "mcpServers": {
     "servicenow-nodejs": {
       "command": "node",
-      "args": ["/Users/YOUR_USERNAME/WebstormProjects/mcp-servicenow-nodejs/src/stdio-server.js"],
-      "cwd": "/Users/YOUR_USERNAME/WebstormProjects/mcp-servicenow-nodejs",
+      "args": ["/path/to/demoenvservicenowmcp/src/stdio-server.js"],
+      "cwd": "/path/to/demoenvservicenowmcp",
       "env": {
         "SERVICENOW_INSTANCE_URL": "https://your-instance.service-now.com",
         "SERVICENOW_USERNAME": "your-username",
@@ -167,8 +167,8 @@ When using multi-instance config, remove the `env` section:
   "mcpServers": {
     "servicenow-nodejs": {
       "command": "node",
-      "args": ["/Users/YOUR_USERNAME/WebstormProjects/mcp-servicenow-nodejs/src/stdio-server.js"],
-      "cwd": "/Users/YOUR_USERNAME/WebstormProjects/mcp-servicenow-nodejs"
+      "args": ["/path/to/demoenvservicenowmcp/src/stdio-server.js"],
+      "cwd": "/path/to/demoenvservicenowmcp"
     }
   }
 }
@@ -282,7 +282,7 @@ If issues occur, check the server logs:
 
 **Fix:**
 1. Verify Node.js is installed: `which node`
-2. Verify path exists: `ls /Users/nczitzer/WebstormProjects/mcp-servicenow-nodejs/src/stdio-server.js`
+2. Verify path exists: `ls /path/to/demoenvservicenowmcp/src/stdio-server.js`
 3. Use full path to node: `/usr/local/bin/node` (or wherever `which node` shows)
 
 ```json
@@ -358,7 +358,7 @@ cat ~/Library/Application\ Support/Claude/claude_desktop_config.json | jq
 
 ### Test Server Manually
 ```bash
-cd /Users/nczitzer/WebstormProjects/mcp-servicenow-nodejs
+cd /path/to/demoenvservicenowmcp
 node src/stdio-server.js
 # Should wait for MCP JSON-RPC messages on stdin
 ```

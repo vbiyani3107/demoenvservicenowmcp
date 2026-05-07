@@ -1,12 +1,12 @@
 {
-  "name": "happy-platform-mcp",
+  "name": "demoenvservicenowmcp",
   "version": "3.2.2",
-  "description": "Happy MCP Server — Model Context Protocol server for the ServiceNow platform with 480+ auto-generated tools, multi-instance support, and natural language search",
+  "description": "Demo Env ServiceNow MCP — Model Context Protocol server for the ServiceNow platform with 480+ auto-generated tools, multi-instance support, and natural language search",
   "main": "src/server.js",
   "type": "module",
-  "mcpName": "io.github.nickzitzer/happy-platform-mcp",
+  "mcpName": "io.github.vbiyani3107/demoenvservicenowmcp",
   "bin": {
-    "happy-platform-mcp": "src/stdio-server.js",
+    "demoenvservicenowmcp": "src/stdio-server.js",
     "servicenow-mcp-server": "src/stdio-server.js"
   },
   "scripts": {
@@ -34,20 +34,20 @@
     "jest": "^30.2.0",
     "nodemon": "^3.1.14"
   },
-  "author": "Happy Technologies LLC",
+  "author": "Vinay Kumar Biyani",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Happy-Technologies-LLC/happy-platform-mcp.git"
+    "url": "git+https://github.com/vbiyani3107/demoenvservicenowmcp.git"
   },
   "bugs": {
-    "url": "https://github.com/Happy-Technologies-LLC/happy-platform-mcp/issues"
+    "url": "https://github.com/vbiyani3107/demoenvservicenowmcp/issues"
   },
-  "homepage": "https://github.com/Happy-Technologies-LLC/happy-platform-mcp#readme",
+  "homepage": "https://github.com/vbiyani3107/demoenvservicenowmcp#readme",
   "keywords": [
     "mcp",
     "model-context-protocol",
-    "happy-platform",
+    "demoenvservicenowmcp",
     "itsm",
     "claude",
     "ai",

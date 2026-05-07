@@ -1,8 +1,4 @@
-<p align="center">
-  <img src="https://happy-tech.biz/images/logo.svg" alt="Happy MCP Server" width="120" height="120">
-</p>
-
-<h1 align="center">Happy MCP Server</h1>
+<h1 align="center">Demo Env ServiceNow MCP</h1>
 
 <p align="center">
   <strong>Model Context Protocol Server for the ServiceNow&reg; Platform</strong></p>
@@ -12,28 +8,27 @@
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/happy-platform-mcp"><img src="https://img.shields.io/npm/v/happy-platform-mcp.svg?style=flat-square" alt="npm version"></a>
+  <a href="https://www.npmjs.com/package/demoenvservicenowmcp"><img src="https://img.shields.io/npm/v/demoenvservicenowmcp.svg?style=flat-square" alt="npm version"></a>
   <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square" alt="License: Apache 2.0"></a>
   <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg?style=flat-square" alt="Node.js Version"></a>
 </p>
 
 <p align="center">
-  <a href="https://happy-tech.biz">Website</a> |
-  <a href="https://github.com/Happy-Technologies-LLC/happy-platform-mcp">GitHub</a> |
-  <a href="https://www.npmjs.com/package/happy-platform-mcp">npm</a> |
+  <a href="https://github.com/vbiyani3107/demoenvservicenowmcp">GitHub</a> |
+  <a href="https://www.npmjs.com/package/demoenvservicenowmcp">npm</a> |
   <a href="#tool-overview">Tools</a> |
   <a href="CONTRIBUTING.md">Contributing</a>
 </p>
 
 ---
 
-> **Migrating from `servicenow-mcp-server`?** The npm package has been renamed to `happy-platform-mcp` and the Docker image to `nczitzer/happy-platform-mcp`. The old names are deprecated but will continue to work temporarily. Update your dependencies:
+> **Migrating from `servicenow-mcp-server`?** The npm package has been renamed to `demoenvservicenowmcp` and the Docker image to `vbiyani3107/demoenvservicenowmcp`. The old names are deprecated but will continue to work temporarily. Update your dependencies:
 > ```bash
 > # npm
-> npm uninstall servicenow-mcp-server && npm install happy-platform-mcp
+> npm uninstall servicenow-mcp-server && npm install demoenvservicenowmcp
 >
 > # Docker
-> docker pull nczitzer/happy-platform-mcp:latest
+> docker pull vbiyani3107/demoenvservicenowmcp:latest
 > ```
 
 ## Features
@@ -62,20 +57,20 @@
 ### Install from npm
 
 ```bash
-npx happy-platform-mcp
+npx demoenvservicenowmcp
 ```
 
 Or install globally:
 
 ```bash
-npm install -g happy-platform-mcp
+npm install -g demoenvservicenowmcp
 ```
 
 ### Install from Source
 
 ```bash
-git clone https://github.com/Happy-Technologies-LLC/happy-platform-mcp.git
-cd happy-platform-mcp
+git clone https://github.com/vbiyani3107/demoenvservicenowmcp.git
+cd demoenvservicenowmcp
 npm install
 ```
 
@@ -230,7 +225,7 @@ Supports 15+ patterns including field comparisons, text searches, date ranges, l
 
 ### ServiceNow Docs Search
 
-Happy MCP can retrieve official ServiceNowDocs markdown directly from GitHub and optionally localize a docs family into a SQLite FTS5 index for fast local search. Local indexing is disabled by default; enable it with `docs.localIndexEnabled=true` in `config/servicenow-instances.json` or `HAPPY_DOCS_ENABLE_LOCAL_INDEX=true`.
+This server can retrieve official ServiceNowDocs markdown directly from GitHub and optionally localize a docs family into a SQLite FTS5 index for fast local search. Local indexing is disabled by default; enable it with `docs.localIndexEnabled=true` in `config/servicenow-instances.json` or `HAPPY_DOCS_ENABLE_LOCAL_INDEX=true`.
 
 ```javascript
 SN-Docs-Families({})
@@ -255,7 +250,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
   "mcpServers": {
     "happy-mcp-server": {
       "command": "npx",
-      "args": ["-y", "happy-platform-mcp"],
+      "args": ["-y", "demoenvservicenowmcp"],
       "env": {
         "SERVICENOW_INSTANCE_URL": "https://your-instance.service-now.com",
         "SERVICENOW_USERNAME": "your-username",
@@ -273,7 +268,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
   "mcpServers": {
     "happy-mcp-server": {
       "command": "npx",
-      "args": ["-y", "happy-platform-mcp"],
+      "args": ["-y", "demoenvservicenowmcp"],
       "env": {
         "SERVICENOW_INSTANCE_URL": "https://your-instance.service-now.com",
         "SERVICENOW_USERNAME": "your-username",
@@ -287,7 +282,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 }
 ```
 
-Or if installed from source, use `"command": "node"` with `"args": ["/path/to/happy-platform-mcp/src/stdio-server.js"]` and `"cwd": "/path/to/happy-platform-mcp"`.
+Or if installed from source, use `"command": "node"` with `"args": ["/path/to/demoenvservicenowmcp/src/stdio-server.js"]` and `"cwd": "/path/to/demoenvservicenowmcp"`.
 
 For multi-instance configurations, use `config/servicenow-instances.json` instead of environment variables. See [Configure Instances](#configure-instances).
 
@@ -295,7 +290,7 @@ Restart Claude Desktop after editing the config.
 
 ## Authentication
 
-Happy MCP Server supports two authentication methods per instance. Both can coexist — instance A can use basic auth while instance B uses OAuth.
+Demo Env ServiceNow MCP supports two authentication methods per instance. Both can coexist — instance A can use basic auth while instance B uses OAuth.
 
 ### Basic Auth (Default)
 
@@ -445,7 +440,7 @@ To report a vulnerability, see [SECURITY.md](SECURITY.md). Do not open public is
 
 Licensed under the [Apache License 2.0](LICENSE).
 
-Copyright 2025 Happy Technologies LLC
+Copyright 2025 Vinay Kumar Biyani
 
 ---
 
@@ -455,6 +450,6 @@ ServiceNow&reg; is a registered trademark of ServiceNow, Inc. "Now" is a registe
 
 Model Context Protocol (MCP) is an open standard created by Anthropic, PBC. "Claude" is a trademark of Anthropic, PBC.
 
-**Happy MCP Server is an independent, community-driven project.** It is not affiliated with, endorsed by, or sponsored by ServiceNow, Inc. or Anthropic, PBC. This project provides tooling that connects to ServiceNow&reg; instances via their published REST APIs, and implements the open MCP specification. It is not a competitor to any ServiceNow&reg; product or service.
+**This project is an independent, community-driven effort.** It is not affiliated with, endorsed by, or sponsored by ServiceNow, Inc. or Anthropic, PBC. This project provides tooling that connects to ServiceNow&reg; instances via their published REST APIs, and implements the open MCP specification. It is not a competitor to any ServiceNow&reg; product or service.
 
 All other trademarks are the property of their respective owners. See [NOTICE](NOTICE) for full attribution.

@@ -8,7 +8,7 @@ Deploy ServiceNow MCP Server using Docker for easy, consistent, and portable dep
 
 ```bash
 # Pull the latest image
-docker pull nczitzer/mcp-servicenow-nodejs:latest
+docker pull vbiyani3107/demoenvservicenowmcp:latest
 
 # Run with environment variables (single instance)
 docker run -d \
@@ -17,7 +17,7 @@ docker run -d \
   -e SERVICENOW_USERNAME=admin \
   -e SERVICENOW_PASSWORD=your-password \
   --name servicenow-mcp-server \
-  nczitzer/mcp-servicenow-nodejs:latest
+  vbiyani3107/demoenvservicenowmcp:latest
 ```
 
 ### Option 2: Docker Compose
@@ -63,7 +63,7 @@ docker run -d \
   -p 3000:3000 \
   -v $(pwd)/config/servicenow-instances.json:/app/config/servicenow-instances.json:ro \
   --name servicenow-mcp-server \
-  nczitzer/mcp-servicenow-nodejs:latest
+  vbiyani3107/demoenvservicenowmcp:latest
 ```
 
 Or use docker-compose:
@@ -71,7 +71,7 @@ Or use docker-compose:
 ```yaml
 services:
   servicenow-mcp-server:
-    image: nczitzer/mcp-servicenow-nodejs:latest
+    image: vbiyani3107/demoenvservicenowmcp:latest
     ports:
       - "3000:3000"
     volumes:
@@ -136,7 +136,7 @@ docker service create \
   --secret servicenow_password \
   -e SERVICENOW_INSTANCE_URL=https://prod.service-now.com \
   -e SERVICENOW_USERNAME=admin \
-  nczitzer/mcp-servicenow-nodejs:latest
+  vbiyani3107/demoenvservicenowmcp:latest
 ```
 
 ### 2. Use Read-Only Config Mount
@@ -144,7 +144,7 @@ docker service create \
 ```bash
 docker run -d \
   -v $(pwd)/config/servicenow-instances.json:/app/config/servicenow-instances.json:ro \
-  nczitzer/mcp-servicenow-nodejs:latest
+  vbiyani3107/demoenvservicenowmcp:latest
 ```
 
 ### 3. Network Isolation
@@ -157,7 +157,7 @@ docker network create mcp-network
 docker run -d \
   --network mcp-network \
   -p 3000:3000 \
-  nczitzer/mcp-servicenow-nodejs:latest
+  vbiyani3107/demoenvservicenowmcp:latest
 ```
 
 ## 🔄 Updates & Maintenance
@@ -166,7 +166,7 @@ docker run -d \
 
 ```bash
 # Pull latest image
-docker pull nczitzer/mcp-servicenow-nodejs:latest
+docker pull vbiyani3107/demoenvservicenowmcp:latest
 
 # Stop and remove old container
 docker stop servicenow-mcp-server
@@ -176,7 +176,7 @@ docker rm servicenow-mcp-server
 docker run -d -p 3000:3000 \
   -e SERVICENOW_INSTANCE_URL=... \
   --name servicenow-mcp-server \
-  nczitzer/mcp-servicenow-nodejs:latest
+  vbiyani3107/demoenvservicenowmcp:latest
 ```
 
 ### View Logs
@@ -216,7 +216,7 @@ spec:
     spec:
       containers:
       - name: servicenow-mcp-server
-        image: nczitzer/mcp-servicenow-nodejs:latest
+        image: vbiyani3107/demoenvservicenowmcp:latest
         ports:
         - containerPort: 3000
         env:
@@ -286,7 +286,7 @@ docker exec servicenow-mcp-server env
 # Run interactively
 docker run -it --rm \
   -e SERVICENOW_INSTANCE_URL=... \
-  nczitzer/mcp-servicenow-nodejs:latest \
+  vbiyani3107/demoenvservicenowmcp:latest \
   sh
 ```
 
@@ -322,11 +322,11 @@ docker exec servicenow-mcp-server curl http://localhost:3000/health
 
 ## 🔗 Links
 
-- **Docker Hub:** https://hub.docker.com/r/nczitzer/mcp-servicenow-nodejs
-- **GitHub:** https://github.com/Happy-Technologies-LLC/mcp-servicenow-nodejs
+- **Docker Hub:** https://hub.docker.com/r/vbiyani3107/demoenvservicenowmcp
+- **GitHub:** https://github.com/vbiyani3107/demoenvservicenowmcp
 - **npm:** https://www.npmjs.com/package/servicenow-mcp-server
-- **MCP Registry:** https://registry.modelcontextprotocol.io/servers/io.github.nickzitzer/servicenow-nodejs
+- **MCP Registry:** https://registry.modelcontextprotocol.io/servers/io.github.vbiyani3107/demoenvservicenowmcp
 
 ## 📄 License
 
-MIT License - Copyright © 2025 Happy Technologies LLC
+Apache License 2.0 — Copyright © 2025 Vinay Kumar Biyani

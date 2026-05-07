@@ -49,7 +49,7 @@ ServiceNow development requires setting:
 
 ### User Insight
 
-User (nczitzer) provided network traffic showing actual UI API calls:
+Early contributor provided network traffic showing actual UI API calls:
 
 ```bash
 # Update Set API
@@ -560,7 +560,7 @@ await SN-Create-Record({
 
 ## Credits
 
-**Discovery:** User (nczitzer) provided network traffic captures
+**Discovery:** Early contributor provided network traffic captures
 **Implementation:** Claude Code MCP Server v2.0
 **Testing:** Verified 2025-09-29
 **Documentation:** This document

@@ -389,7 +389,7 @@ curl -X PUT 'https://dev276360.service-now.com/api/now/ui/concoursepicker/applic
 
 ## Credits
 
-**Discovery:** User (nczitzer) provided network traffic captures showing actual endpoint usage
+**Discovery:** Early contributor provided network traffic captures showing actual endpoint usage
 **Implementation:** Claude Code MCP Server v2.0
 **Dates:**
 - Update Set API: 2025-09-29

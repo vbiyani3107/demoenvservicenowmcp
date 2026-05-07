@@ -1291,7 +1291,7 @@ Submits a completed Service Catalog form via the ServiceNow Service Catalog REST
 
 ## ServiceNow Docs Search Tools
 
-These tools use the official `ServiceNow/ServiceNowDocs` markdown repository as the source of truth. Live GitHub discovery/get work without local indexing. Local sync is optional, disabled by default, and builds a SQLite FTS5 index under `~/.happy-platform-mcp/docs/servicenow` when `docs.localIndexEnabled=true` or `HAPPY_DOCS_ENABLE_LOCAL_INDEX=true`. Vector mode is opt-in: set `docs.enableVector=true` or `HAPPY_DOCS_ENABLE_VECTOR=true` with `embeddingProvider=local` to build and query a sqlite-vec index using deterministic local embeddings.
+These tools use the official `ServiceNow/ServiceNowDocs` markdown repository as the source of truth. Live GitHub discovery/get work without local indexing. Local sync is optional, disabled by default, and builds a SQLite FTS5 index under `~/.demoenvservicenowmcp/docs/servicenow` when `docs.localIndexEnabled=true` or `HAPPY_DOCS_ENABLE_LOCAL_INDEX=true`. Vector mode is opt-in: set `docs.enableVector=true` or `HAPPY_DOCS_ENABLE_VECTOR=true` with `embeddingProvider=local` to build and query a sqlite-vec index using deterministic local embeddings.
 
 ### SN-Docs-Families
 
