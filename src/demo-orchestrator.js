@@ -36,6 +36,7 @@ function emptyReceipt(clientName, clientPrefix) {
     purchase_orders: { created: [], skipped: [], available: null },
     reports: { created: [], skipped: [] },
     dashboard: null,
+    platform_dashboard: null,
     widgetOverrides: { applied: [], skipped: [] },
     errors: []
   };
@@ -433,8 +434,24 @@ export async function applyData(serviceNowClient, payload, options = {}) {
   return out;
 }
 
-async function resolveDefaultCatalog(serviceNowClient) {
+async function resolveCatalog(serviceNowClient, catalogName) {
   try {
+    if (catalogName) {
+      const specific = await serviceNowClient.getRecords('sc_catalog', {
+        sysparm_query: `title=${ESC_QV(catalogName)}^active=true`,
+        sysparm_limit: 1,
+        sysparm_fields: 'sys_id,title'
+      });
+      if (specific[0]) return specific[0].sys_id;
+    }
+
+    const standardCatalog = await serviceNowClient.getRecords('sc_catalog', {
+      sysparm_query: 'title=Service Catalog^active=true',
+      sysparm_limit: 1,
+      sysparm_fields: 'sys_id,title'
+    });
+    if (standardCatalog[0]) return standardCatalog[0].sys_id;
+
     const catalogs = await serviceNowClient.getRecords('sc_catalog', {
       sysparm_query: 'active=true',
       sysparm_limit: 1,
@@ -493,7 +510,16 @@ export async function applyCatalog(serviceNowClient, categories, catalogItems) {
     errors: []
   };
 
-  const defaultCatalogId = await resolveDefaultCatalog(serviceNowClient);
+  const catalogCache = new Map();
+  async function getCatalogId(name) {
+    const key = name || 'DEFAULT_CATALOG';
+    if (catalogCache.has(key)) return catalogCache.get(key);
+    const sysId = await resolveCatalog(serviceNowClient, name);
+    if (sysId) catalogCache.set(key, sysId);
+    return sysId;
+  }
+
+  const defaultCatalogId = await getCatalogId();
   if (!defaultCatalogId) {
     out.errors.push('No active sc_catalog found; categories/items will be created without sc_catalog binding.');
   }
@@ -511,13 +537,15 @@ export async function applyCatalog(serviceNowClient, categories, catalogItems) {
         sysparm_fields: 'sys_id,title'
       });
       if (existing[0]) {
-        categoryMap.set(cat.name, existing[0].sys_id);
+        const catCatalogId = await getCatalogId(cat.catalog);
+        categoryMap.set(cat.name, { sys_id: existing[0].sys_id, catalog: catCatalogId });
         out.categories.skipped.push({ name: cat.name, sys_id: existing[0].sys_id, reason: 'already exists' });
       } else {
         const data = { title: cat.name, description: cat.description || '', active: 'true' };
-        if (defaultCatalogId) data.sc_catalog = defaultCatalogId;
+        const catCatalogId = await getCatalogId(cat.catalog);
+        if (catCatalogId) data.sc_catalog = catCatalogId;
         const created = await serviceNowClient.createRecord('sc_category', data);
-        categoryMap.set(cat.name, created.sys_id);
+        categoryMap.set(cat.name, { sys_id: created.sys_id, catalog: catCatalogId });
         out.categories.created.push({ name: cat.name, sys_id: created.sys_id });
       }
     } catch (e) {
@@ -548,12 +576,16 @@ export async function applyCatalog(serviceNowClient, categories, catalogItems) {
           price: item.price != null ? String(item.price) : '0',
           active: 'true'
         };
+        let itemCatalogId = null;
         if (item.category && categoryMap.has(item.category)) {
-          data.category = categoryMap.get(item.category);
+          const mappedCat = categoryMap.get(item.category);
+          data.category = mappedCat.sys_id;
+          itemCatalogId = mappedCat.catalog;
         } else if (item.category) {
           out.errors.push(`Catalog item "${item.name}" references unknown category "${item.category}"`);
         }
-        if (defaultCatalogId) data.sc_catalogs = defaultCatalogId;
+        if (!itemCatalogId) itemCatalogId = await getCatalogId();
+        if (itemCatalogId) data.sc_catalogs = itemCatalogId;
         const created = await serviceNowClient.createRecord('sc_cat_item', data);
         itemSysId = created.sys_id;
         out.catalogItems.created.push({ name: item.name, sys_id: itemSysId, category: item.category || null });
@@ -755,6 +787,301 @@ export async function applyDashboard(serviceNowClient, dashboardSpec) {
     } catch (e) {
       out.errors.push(`Widget instance "${w.id}": ${e.message}`);
     }
+  }
+
+  return out;
+}
+
+/**
+ * applyPlatformDashboard — provision a native platform analytics dashboard.
+ * Maps components into par_dashboard, par_dashboard_tab, par_dashboard_canvas, and par_dashboard_widget tables.
+ */
+export async function applyPlatformDashboard(serviceNowClient, spec) {
+  const out = {
+    dashboard: { name: null, sys_id: null },
+    tab: { sys_id: null },
+    canvas: { sys_id: null },
+    widgets: { created: [], skipped: [] },
+    errors: []
+  };
+
+  if (!spec || !spec.platformDashboard) {
+    return out;
+  }
+
+  const clientPrefix = spec.clientPrefix;
+  const dashSpec = spec.platformDashboard;
+  const dashName = dashSpec.title || `${clientPrefix} Operations Dashboard`;
+
+  out.dashboard.name = dashName;
+
+  try {
+    // 1. Create or retrieve par_dashboard
+    let dashSysId;
+    const existingDash = await serviceNowClient.getRecords('par_dashboard', {
+      sysparm_query: `name=${ESC_QV(dashName)}`,
+      sysparm_limit: 1,
+      sysparm_fields: 'sys_id,name'
+    });
+
+    if (existingDash[0]) {
+      dashSysId = existingDash[0].sys_id;
+      out.dashboard.sys_id = dashSysId;
+    } else {
+      const createdDash = await serviceNowClient.createRecord('par_dashboard', {
+        name: dashName,
+        grid: '48',
+        active: 'true'
+      });
+      dashSysId = createdDash.sys_id;
+      out.dashboard.sys_id = dashSysId;
+    }
+
+    // 2. Create or retrieve par_dashboard_tab
+    let tabSysId;
+    const existingTab = await serviceNowClient.getRecords('par_dashboard_tab', {
+      sysparm_query: `dashboard=${dashSysId}^name=Overview`,
+      sysparm_limit: 1,
+      sysparm_fields: 'sys_id'
+    });
+
+    if (existingTab[0]) {
+      tabSysId = existingTab[0].sys_id;
+      out.tab.sys_id = tabSysId;
+    } else {
+      const createdTab = await serviceNowClient.createRecord('par_dashboard_tab', {
+        dashboard: dashSysId,
+        name: 'Overview',
+        order: '0',
+        active: 'true'
+      });
+      tabSysId = createdTab.sys_id;
+      out.tab.sys_id = tabSysId;
+    }
+
+    // 3. Create or retrieve par_dashboard_canvas
+    let canvasSysId;
+    const existingCanvas = await serviceNowClient.getRecords('par_dashboard_canvas', {
+      sysparm_query: `dashboard=${dashSysId}^dashboard_tab=${tabSysId}`,
+      sysparm_limit: 1,
+      sysparm_fields: 'sys_id'
+    });
+
+    if (existingCanvas[0]) {
+      canvasSysId = existingCanvas[0].sys_id;
+      out.canvas.sys_id = canvasSysId;
+    } else {
+      const createdCanvas = await serviceNowClient.createRecord('par_dashboard_canvas', {
+        dashboard: dashSysId,
+        dashboard_tab: tabSysId
+      });
+      canvasSysId = createdCanvas.sys_id;
+      out.canvas.sys_id = canvasSysId;
+    }
+
+    // 4. Create widgets (par_dashboard_widget)
+    const layout = [];
+    const widgetsSpec = Array.isArray(dashSpec.widgets) ? dashSpec.widgets : [];
+
+    for (const w of widgetsSpec) {
+      if (!w.name || !w.type || !w.table) {
+        out.errors.push(`Widget missing name, type, or table: ${JSON.stringify(w)}`);
+        continue;
+      }
+
+      // Check if widget already exists on this canvas
+      const widgetQuery = `canvas=${canvasSysId}^name=${ESC_QV(w.name)}`;
+      const existingWidget = await serviceNowClient.getRecords('par_dashboard_widget', {
+        sysparm_query: widgetQuery,
+        sysparm_limit: 1,
+        sysparm_fields: 'sys_id'
+      });
+
+      let widgetSysId;
+      let compId;
+      let props = {};
+
+      if (w.type === 'single_score') {
+        compId = 'd24d53f60350de7a652caf3188a46ed2';
+        const dsId = `ds_${Math.random().toString(36).substring(2, 10)}`;
+        const metricId = `metric_${Math.random().toString(36).substring(2, 10)}`;
+        props = {
+          configVersion: "23.0.0-ci-SNAPSHOT",
+          scoreSize: "lg",
+          showZero: true,
+          showHeader: true,
+          headerTitle: w.name,
+          showBorder: true,
+          followFilters: true,
+          showFilterIcon: true,
+          colorConfig: { type: "default" },
+          dataSources: [{
+            isDatabaseView: false,
+            allowRealTime: true,
+            label: w.table,
+            sourceType: "table",
+            tableOrViewName: w.table,
+            filterQuery: w.filter || "active=true",
+            preferredVisualizations: ["d24d53f60350de7a652caf3188a46ed2"],
+            id: dsId,
+            dataCategories: ["trend", "group", "simple"]
+          }],
+          metrics: [{
+            dataSource: dsId,
+            id: metricId,
+            aggregateFunction: "COUNT",
+            axisId: "primary",
+            numberFormat: { customFormat: false }
+          }]
+        };
+      } else if (w.type === 'list') {
+        compId = '2b1c080881e05dc63b917044290b233f';
+        props = {
+          table: w.table,
+          columns: w.columns || 'number,short_description,state,priority,assigned_to',
+          query: w.filter || 'active=true',
+          fixedQuery: w.filter || 'active=true',
+          listTitle: w.name,
+          followFilters: true,
+          isDashboard: true,
+          limit: 10,
+          showBorder: true,
+          bare: false
+        };
+      } else if (w.type === 'donut' || w.type === 'bar') {
+        compId = w.type === 'donut' ? 'a2b0596cec6b9d49dd1ff9bf76b5084b' : '23051643b7e03010097cb81cde11a910';
+        const dsId = `ds_${Math.random().toString(36).substring(2, 10)}`;
+        const metricId = `metric_${Math.random().toString(36).substring(2, 10)}`;
+        props = {
+          configVersion: "23.0.0-ci-SNAPSHOT",
+          showHeader: true,
+          headerTitle: w.name,
+          showBorder: true,
+          followFilters: true,
+          showFilterIcon: true,
+          colorConfig: { type: "default" },
+          dataSources: [{
+            isDatabaseView: false,
+            allowRealTime: true,
+            label: w.table,
+            sourceType: "table",
+            tableOrViewName: w.table,
+            filterQuery: w.filter || "active=true",
+            preferredVisualizations: [compId],
+            id: dsId,
+            dataCategories: ["trend", "group", "simple"]
+          }],
+          metrics: [{
+            dataSource: dsId,
+            id: metricId,
+            aggregateFunction: "COUNT",
+            axisId: "primary",
+            numberFormat: { customFormat: false }
+          }],
+          groupBy: [{
+            maxNumberOfGroups: 10,
+            showOthers: true,
+            groupBy: [{
+              dataSource: dsId,
+              groupByField: w.groupByField || "state"
+            }]
+          }]
+        };
+      } else {
+        out.errors.push(`Unsupported widget type: ${w.type}`);
+        continue;
+      }
+
+      const componentPropsStr = JSON.stringify(props);
+      const widgetData = {
+        canvas: canvasSysId,
+        component: compId,
+        x: String(w.x || 0),
+        y: String(w.y || 0),
+        w: String(w.w || 12),
+        h: String(w.h || 10),
+        name: w.name,
+        component_props: componentPropsStr
+      };
+
+      if (existingWidget[0]) {
+        widgetSysId = existingWidget[0].sys_id;
+        // Update widget coordinates & props in case they changed
+        await serviceNowClient.updateRecord('par_dashboard_widget', widgetSysId, widgetData);
+        out.widgets.skipped.push({ name: w.name, sys_id: widgetSysId, reason: 'updated in place' });
+      } else {
+        const createdWidget = await serviceNowClient.createRecord('par_dashboard_widget', widgetData);
+        widgetSysId = createdWidget.sys_id;
+        out.widgets.created.push({ name: w.name, sys_id: widgetSysId });
+      }
+
+      layout.push({
+        sys_id: widgetSysId,
+        x: w.x || 0,
+        y: w.y || 0,
+        w: w.w || 12,
+        h: w.h || 10,
+        name: w.name,
+        component_id: compId,
+        component_props: componentPropsStr,
+        can_edit: true
+      });
+    }
+
+    // 5. Update canvas layout JSON string
+    await serviceNowClient.updateRecord('par_dashboard_canvas', canvasSysId, {
+      layout: JSON.stringify(layout)
+    });
+
+    // 6. Create visibility record for Platform Analytics Workspace
+    const workspaceRegistry = '08c73d60537101100834ddeeff7b1287'; // Platform Analytics Workspace
+    try {
+      const existingVis = await serviceNowClient.getRecords('par_dashboard_visibility', {
+        sysparm_query: `dashboard=${dashSysId}^experience=${workspaceRegistry}`,
+        sysparm_limit: 1,
+        sysparm_fields: 'sys_id'
+      });
+      if (!existingVis[0]) {
+        await serviceNowClient.createRecord('par_dashboard_visibility', {
+          dashboard: dashSysId,
+          experience: workspaceRegistry
+        });
+      }
+    } catch (visError) {
+      out.errors.push(`Dashboard visibility provisioning failed: ${visError.message}`);
+    }
+
+    // 7. Create owner permission record for System Administrator (admin)
+    try {
+      // Find admin's sys_id
+      const adminUsers = await serviceNowClient.getRecords('sys_user', {
+        sysparm_query: 'user_name=admin',
+        sysparm_limit: 1,
+        sysparm_fields: 'sys_id'
+      });
+      const adminSysId = adminUsers[0] ? adminUsers[0].sys_id : '6816f79cc0a8016401c5a33be04be441';
+      
+      const existingPerm = await serviceNowClient.getRecords('par_dashboard_permission', {
+        sysparm_query: `dashboard=${dashSysId}^user=${adminSysId}`,
+        sysparm_limit: 1,
+        sysparm_fields: 'sys_id'
+      });
+      if (!existingPerm[0]) {
+        await serviceNowClient.createRecord('par_dashboard_permission', {
+          dashboard: dashSysId,
+          owner: 'true',
+          user: adminSysId,
+          can_read: 'true',
+          can_write: 'true',
+          can_share: 'true'
+        });
+      }
+    } catch (permError) {
+      out.errors.push(`Dashboard permission provisioning failed: ${permError.message}`);
+    }
+
+  } catch (e) {
+    out.errors.push(`Platform Dashboard creation failed: ${e.message}`);
   }
 
   return out;
@@ -983,6 +1310,17 @@ export async function deployDemo(serviceNowClient, spec) {
     }
   }
 
+  // Platform Analytics Dashboard (par_dashboard*)
+  if (spec.platformDashboard && typeof spec.platformDashboard === 'object') {
+    try {
+      const pDashResult = await applyPlatformDashboard(serviceNowClient, spec);
+      receipt.platform_dashboard = pDashResult;
+      if (pDashResult.errors.length) receipt.errors.push(...pDashResult.errors);
+    } catch (e) {
+      receipt.errors.push(`Platform Dashboard: ${e.message}`);
+    }
+  }
+
   receipt.summary = {
     branding_themes_updated: receipt.branding ? receipt.branding.themesUpdated || 0 : 0,
     branding_logo_uploaded: !!(receipt.branding && receipt.branding.logoSysId),
@@ -1006,6 +1344,8 @@ export async function deployDemo(serviceNowClient, spec) {
     dashboard_widgets_bound: receipt.dashboard ? receipt.dashboard.widgets.created.length : 0,
     dashboard_widgets_skipped: receipt.dashboard ? receipt.dashboard.widgets.skipped.length : 0,
     dashboard_widgets_missing: receipt.dashboard ? receipt.dashboard.widgets.missing.length : 0,
+    platform_dashboard_widgets_created: receipt.platform_dashboard ? receipt.platform_dashboard.widgets.created.length : 0,
+    platform_dashboard_widgets_skipped: receipt.platform_dashboard ? receipt.platform_dashboard.widgets.skipped.length : 0,
     widget_overrides_applied: receipt.widgetOverrides.applied.length,
     errors: receipt.errors.length
   };

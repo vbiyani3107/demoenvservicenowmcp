@@ -13,6 +13,19 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { ServiceNowClient } from './servicenow-client.js';
 import { createMcpServer } from './mcp-server-consolidated.js';
 import { configManager } from './config-manager.js';
+import fs from 'fs';
+
+fs.writeFileSync('C:/Users/alisha.khalid/Documents/Projects/demoenvservicenowmcp/started.log', 'Process started at ' + new Date().toISOString() + '\n');
+
+process.on('uncaughtException', (err) => {
+
+  fs.appendFileSync('C:/Users/alisha.khalid/Documents/Projects/demoenvservicenowmcp/crash.log', 'UNCAUGHT EXCEPTION: ' + err.stack + '\n');
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  fs.appendFileSync('C:/Users/alisha.khalid/Documents/Projects/demoenvservicenowmcp/crash.log', 'UNHANDLED REJECTION: ' + (reason && reason.stack ? reason.stack : reason) + '\n');
+});
+
 
 // Load environment variables
 dotenv.config();

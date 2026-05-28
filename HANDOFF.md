@@ -79,20 +79,29 @@ MCP server on first use.
 `File → Open` → select the `demoenvservicenowmcp` folder. The workspace rule
 in `.cursor/rules/servicenow-demo.mdc` will auto-load and steer the agent.
 
-### 6. Try it
+### 6. Try it (Two flexible methods)
 
-In a fresh Cursor chat, type something like:
+You can seed new demo environments using either the conversational AI-driven agent or our high-speed CLI utility.
 
-> *Set up a ServiceNow demo for **MedNorth Health** — they're a regional hospital network with about 8,000 staff. Generate realistic categories, catalog items, at least 2 users, and a handful of incidents.*
+#### Method A: Conversational Seeding (AI-Driven)
+In a fresh Cursor chat window, simply tell the connected agent:
+> *Set up a ServiceNow demo for **Delta Airlines** — they are an international aviation carrier. Generate visual branding (deep blue/gold), catalog categories, 2 users, 3 IT incidents for gate printer failures, and a symmetrical platform operations dashboard.*
 
-The agent will:
+The MCP agent will automatically:
+1. Generate an industry-appropriate, beautiful JSON payload matching the specifications.
+2. Call the `SN-Deploy-Demo` MCP tool.
+3. Hand back a visually rich execution receipt showing active Update Sets and created components.
 
-1. Pick `SN-Deploy-Demo` automatically (no need to name the tool).
-2. Generate an industry-appropriate JSON payload.
-3. Call the orchestrator once.
-4. Hand you back a receipt: created vs skipped records, the Update Set name and sys_id, and any errors.
+#### Method B: The Command Line Seeding Script (High-Speed CLI)
+If your supervisor wants to seed without invoking an LLM chat, they can run our universal CLI script by passing any industry JSON payload file path as an argument:
 
-That's it. Re-running the same prompt is a safe no-op (idempotent on `title` / `name` / `user_name` / `correlation_id`).
+```bash
+# Deploys a healthcare demo environment
+node deploy.js examples/sample-payload-healthcare.json
+
+# Deploys a custom industry payload
+node deploy.js path/to/your-payload.json
+```
 
 ---
 

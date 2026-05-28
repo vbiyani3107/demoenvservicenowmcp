@@ -72,20 +72,59 @@ DemoOrchestratorAPI.prototype = {
                 var extension = (mimeType.split('/')[1] || 'png').replace(/[^a-z0-9]/gi, '');
                 var safeClient = (demoConfig.clientName || 'demo').replace(/\s+/g, '_').toLowerCase();
                 var fileName = 'demo_logo_' + safeClient + '.' + extension;
+                var attachSysId = null;
+                var sa = new GlideSysAttachment();
+                
+                // First try to attach to sp_portal using global-compliant write()
                 var dummyPortal = new GlideRecord('sp_portal');
                 dummyPortal.query();
                 if (dummyPortal.next()) {
-                    var sa = new GlideSysAttachment();
-                    var attachSysId = sa.writeBase64(dummyPortal, fileName, mimeType, demoConfig.logoBase64);
-                    if (attachSysId) {
-                        finalLogoUrl = '/sys_attachment.do?sys_id=' + attachSysId;
-                        result.logoSysId = attachSysId;
-                        gs.info('[BRANDING] Stored Base64 upload as sys_attachment: ' + attachSysId);
-                    } else {
-                        result.errors.push('GlideSysAttachment.writeBase64 returned no sys_id');
+                    try {
+                        var decodedBytes = GlideStringUtil.base64DecodeAsBytes(demoConfig.logoBase64);
+                        attachSysId = sa.write(
+                            dummyPortal,
+                            String(fileName),
+                            String(mimeType),
+                            decodedBytes
+                        );
+                    } catch (err) {
+                        gs.info('[BRANDING] sp_portal attachment write threw: ' + err);
                     }
+                }
+                
+                // Fallback to active user record if sp_portal attachment returned no sys_id
+                if (!attachSysId) {
+                    var userGR = new GlideRecord('sys_user');
+                    var userSysId = gs.getUserID();
+                    if (!userSysId || userSysId === 'system') {
+                        userGR.addQuery('user_name', 'admin');
+                        userGR.query();
+                        if (userGR.next()) {
+                            userSysId = userGR.getUniqueValue();
+                        }
+                    }
+                    if (userSysId && userGR.get(userSysId)) {
+                        try {
+                            var decodedBytes = GlideStringUtil.base64DecodeAsBytes(demoConfig.logoBase64);
+                            attachSysId = sa.write(
+                                userGR,
+                                String(fileName),
+                                String(mimeType),
+                                decodedBytes
+                            );
+                            gs.info('[BRANDING] Attached logo to sys_user as fallback: ' + attachSysId);
+                        } catch (err) {
+                            gs.info('[BRANDING] sys_user attachment write threw: ' + err);
+                        }
+                    }
+                }
+
+                if (attachSysId) {
+                    finalLogoUrl = '/sys_attachment.do?sys_id=' + attachSysId;
+                    result.logoSysId = attachSysId;
+                    gs.info('[BRANDING] Stored Base64 upload as sys_attachment: ' + attachSysId);
                 } else {
-                    result.errors.push('No sp_portal record found to host the logo attachment');
+                    result.errors.push('GlideSysAttachment.write returned no sys_id from both sp_portal and sys_user fallback');
                 }
             } catch (ex) {
                 result.errors.push('Base64 logo upload failed: ' + ex);
@@ -194,7 +233,11 @@ DemoOrchestratorAPI.prototype = {
                 hrCases: 0,
                 purchaseOrders: 0,
                 reports: 0,
-                spInstances: 0
+                spInstances: 0,
+                parDashboardWidgets: 0,
+                parDashboardCanvases: 0,
+                parDashboardTabs: 0,
+                parDashboards: 0
             },
             themesCleaned: 0,
             heroContainersReset: 0,
@@ -284,6 +327,42 @@ DemoOrchestratorAPI.prototype = {
             result.deleted.spInstances = spiGR.getRowCount();
             spiGR.deleteMultiple();
         } catch (e) { result.errors.push('Widget instances: ' + e); }
+
+        // Clean up Platform Analytics Dashboard widgets
+        try {
+            var dwGR = new GlideRecord('par_dashboard_widget');
+            dwGR.addQuery('canvas.dashboard.name', 'STARTSWITH', clientPrefix);
+            dwGR.query();
+            result.deleted.parDashboardWidgets = dwGR.getRowCount();
+            dwGR.deleteMultiple();
+        } catch (e) { result.errors.push('PAR Dashboard Widgets: ' + e); }
+
+        // Clean up Platform Analytics Dashboard canvases
+        try {
+            var dcGR = new GlideRecord('par_dashboard_canvas');
+            dcGR.addQuery('dashboard.name', 'STARTSWITH', clientPrefix);
+            dcGR.query();
+            result.deleted.parDashboardCanvases = dcGR.getRowCount();
+            dcGR.deleteMultiple();
+        } catch (e) { result.errors.push('PAR Dashboard Canvases: ' + e); }
+
+        // Clean up Platform Analytics Dashboard tabs
+        try {
+            var dtGR = new GlideRecord('par_dashboard_tab');
+            dtGR.addQuery('dashboard.name', 'STARTSWITH', clientPrefix);
+            dtGR.query();
+            result.deleted.parDashboardTabs = dtGR.getRowCount();
+            dtGR.deleteMultiple();
+        } catch (e) { result.errors.push('PAR Dashboard Tabs: ' + e); }
+
+        // Clean up Platform Analytics Dashboards
+        try {
+            var dbGR = new GlideRecord('par_dashboard');
+            dbGR.addQuery('name', 'STARTSWITH', clientPrefix);
+            dbGR.query();
+            result.deleted.parDashboards = dbGR.getRowCount();
+            dbGR.deleteMultiple();
+        } catch (e) { result.errors.push('PAR Dashboards: ' + e); }
 
         try {
             var portalGR = new GlideRecord('sp_portal');

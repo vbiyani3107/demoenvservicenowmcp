@@ -8,9 +8,9 @@
   "instances": [
     {
       "name": "dev",
-      "url": "https://your-dev-instance.service-now.com",
-      "username": "your_dev_username",
-      "password": "your_dev_password",
+      "url": "https://dev371566.service-now.com/",
+      "username": "admin",
+      "password": "oa1MasGK4P*^",
       "default": true,
       "description": "Development instance"
     },

@@ -12,6 +12,7 @@ import path from 'path';
 import { configManager } from './config-manager.js';
 import { syncScript, syncAllScripts, SCRIPT_TYPES } from './script-sync.js';
 import { parseNaturalLanguage, getSupportedPatterns } from './natural-language.js';
+import { fileURLToPath } from 'url';
 import { docsToolDefinitions } from './docs/tool-definitions.js';
 import { handleDocsTool } from './docs/tool-handlers.js';
 import {
@@ -61,7 +62,8 @@ export async function createMcpServer(serviceNowClient, options = {}) {
   // Load table metadata
   let tableMetadata = {};
   try {
-    const metadataPath = path.resolve(path.dirname(import.meta.url.replace('file://', '')), 'config/comprehensive-table-definitions.json');
+    const __dirname = path.dirname(fileURLToPath(import.meta.url));
+    const metadataPath = path.resolve(__dirname, '../config/comprehensive-table-definitions.json');
     const rawData = await fs.readFile(metadataPath, 'utf-8');
     const fullData = JSON.parse(rawData);
 
@@ -1378,13 +1380,13 @@ export async function createMcpServer(serviceNowClient, options = {}) {
       },
       {
         name: 'SN-Deploy-Demo',
-        description: 'PREFERRED TOOL for any request that asks to deploy / set up / bootstrap / provision / seed / onboard / stand up / spin up / scaffold a ServiceNow demo (or demo data, demo environment, demo tenant) for a client / customer / tenant / organisation / company. Single-call orchestrator: creates or reuses a dedicated Update Set, applies branding (theme CSS + optional hero container background), then idempotently provisions Service Catalog categories, catalog items, sys_users, incidents, HR cases (sn_hr_core_case, plugin-gated), purchase orders (proc_po, plugin-gated), sys_report rows used by dashboards, and Service Portal widget bindings (sp_instance) on the index page. Skip-if-exists semantics keyed on sc_category.title, sc_cat_item.name, sys_user.user_name, incident/hr_case/po.correlation_id, sys_report.title, and (sp_column, sp_widget) — safe to re-run. STRONGLY PREFER this tool over calling SN-Create-Record / SN-Batch-Create / SN-Create-Incident / SN-Catalog-Submit individually for client demo provisioning. Input is a single JSON string (payload) with shape: {"clientName":"...","clientPrefix":"<alphanumeric>","primaryColor":"#hex","secondaryColor":"#hex","heroBackgroundColor":"#hex","categories":[{"name":"...","description":"..."}],"catalogItems":[{"name":"...","category":"<must match a category name above>","short_description":"..."}],"users":[{"first_name":"...","last_name":"...","user_name":"...","email":"...","title":"..."}],"incidents":[{"short_description":"...","description":"...","category":"software|network|hardware|inquiry|database|security","correlation_id":"<stable unique id>"}],"hr_cases":[{"short_description":"...","correlation_id":"<prefix>_hrc_<n>"}],"purchase_orders":[{"short_description":"...","total_cost":"123","correlation_id":"<prefix>_po_<n>"}],"reports":[{"title":"<prefix> - ...","table":"incident","type":"donut","field":"category"}],"dashboard":{"pageId":"index","widgets":[{"id":"<sp_widget.id>","order":100,"title":"..."}]}}. Tailor generated content to the client industry. Returns a structured receipt of created vs skipped records per entity type plus the Update Set sys_id.',
+        description: 'PREFERRED TOOL for any request that asks to deploy / set up / bootstrap / provision / seed / onboard / stand up / spin up / scaffold a ServiceNow demo (or demo data, demo environment, demo tenant) for a client / customer / tenant / organisation / company. Single-call orchestrator: creates or reuses a dedicated Update Set, applies branding (theme CSS + optional hero container background), then idempotently provisions Service Catalog categories, catalog items, sys_users, incidents, HR cases (sn_hr_core_case, plugin-gated), purchase orders (proc_po, plugin-gated), sys_report rows used by dashboards, and Service Portal widget bindings (sp_instance) on the index page. Skip-if-exists semantics keyed on sc_category.title, sc_cat_item.name, sys_user.user_name, incident/hr_case/po.correlation_id, sys_report.title, and (sp_column, sp_widget) — safe to re-run. STRONGLY PREFER this tool over calling SN-Create-Record / SN-Batch-Create / SN-Create-Incident / SN-Catalog-Submit individually for client demo provisioning. Input is a single JSON string (payload) with shape: {"clientName":"...","clientPrefix":"<alphanumeric>","primaryColor":"#hex","secondaryColor":"#hex","heroBackgroundColor":"#hex","categories":[{"name":"...","description":"...","catalog":"..."}],"catalogItems":[{"name":"...","category":"<must match a category name above>","short_description":"..."}],"users":[{"first_name":"...","last_name":"...","user_name":"...","email":"...","title":"..."}],"incidents":[{"short_description":"...","description":"...","category":"software|network|hardware|inquiry|database|security","correlation_id":"<stable unique id>"}],"hr_cases":[{"short_description":"...","correlation_id":"<prefix>_hrc_<n>"}],"purchase_orders":[{"short_description":"...","total_cost":"123","correlation_id":"<prefix>_po_<n>"}],"reports":[{"title":"<prefix> - ...","table":"incident","type":"donut","field":"category"}],"dashboard":{"pageId":"index","widgets":[{"id":"<sp_widget.id>","order":100,"title":"..."}]}}. Tailor generated content to the client industry. Returns a structured receipt of created vs skipped records per entity type plus the Update Set sys_id.',
         inputSchema: {
           type: 'object',
           properties: {
             payload: {
               type: 'string',
-              description: 'Minified JSON string with the full demo spec. Schema: {"clientName":"...","clientPrefix":"...","primaryColor":"#hex","secondaryColor":"#hex","heroBackgroundColor":"#hex","heroBackgroundImage":"<sys_attachment url or sys_id>","categories":[{"name":"...","description":"..."}],"catalogItems":[{"name":"...","category":"<category title>","short_description":"..."}],"users":[{"first_name":"...","last_name":"...","user_name":"...","email":"...","title":"..."}],"incidents":[{"short_description":"...","description":"...","category":"software","correlation_id":"..."}],"hr_cases":[{"short_description":"...","correlation_id":"<prefix>_hrc_1"}],"purchase_orders":[{"short_description":"...","total_cost":"100","correlation_id":"<prefix>_po_1"}],"reports":[{"title":"<prefix> - Open Incidents","table":"incident","type":"donut","field":"category"}],"dashboard":{"pageId":"index","widgets":[{"id":"demo_kpi_dashboard","order":100}]}}'
+              description: 'Minified JSON string with the full demo spec. Schema: {"clientName":"...","clientPrefix":"...","primaryColor":"#hex","secondaryColor":"#hex","heroBackgroundColor":"#hex","heroBackgroundImage":"<sys_attachment url or sys_id>","categories":[{"name":"...","description":"...","catalog":"..."}],"catalogItems":[{"name":"...","category":"<category title>","short_description":"..."}],"users":[{"first_name":"...","last_name":"...","user_name":"...","email":"...","title":"..."}],"incidents":[{"short_description":"...","description":"...","category":"software","correlation_id":"..."}],"hr_cases":[{"short_description":"...","correlation_id":"<prefix>_hrc_1"}],"purchase_orders":[{"short_description":"...","total_cost":"100","correlation_id":"<prefix>_po_1"}],"reports":[{"title":"<prefix> - Open Incidents","table":"incident","type":"donut","field":"category"}],"dashboard":{"pageId":"index","widgets":[{"id":"demo_kpi_dashboard","order":100}]}}'
             },
             instance: {
               type: 'string',
@@ -1510,7 +1512,8 @@ export async function createMcpServer(serviceNowClient, options = {}) {
                 type: 'object',
                 properties: {
                   name: { type: 'string', description: 'Stored as sc_category.title.' },
-                  description: { type: 'string' }
+                  description: { type: 'string' },
+                  catalog: { type: 'string', description: 'Optional catalog title to override the default Service Catalog.' }
                 },
                 required: ['name']
               }

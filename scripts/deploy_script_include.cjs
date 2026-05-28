@@ -35,6 +35,7 @@
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
 // Connection details come from the environment ONLY — never check credentials
 // into source. See .env.example at the repo root for the expected variables.
@@ -56,6 +57,9 @@ if (missingEnv.length > 0) {
 }
 const authHeader = 'Basic ' + Buffer.from(`${username}:${password}`).toString('base64');
 
+// Clean hostname for Node's https request options
+const rawHost = instanceUrl.replace(/^https?:\/\//i, '').split('/')[0];
+
 const SCRIPT_INCLUDE_NAME = 'DemoOrchestratorAPI';
 const REST_API_NAME = 'Demo Orchestrator';
 const REST_API_SERVICE_ID = 'demo_orchestrator';
@@ -75,7 +79,7 @@ const scriptCode = fs.readFileSync(SI_SOURCE_PATH, 'utf8');
 function makeRequest(method, path, data) {
     return new Promise((resolve, reject) => {
         const options = {
-            hostname: instanceUrl,
+            hostname: rawHost,
             path,
             method,
             headers: {
@@ -429,8 +433,8 @@ async function deploy() {
     const liveServiceId = (verify.data && verify.data.result && verify.data.result.service_id) || REST_API_SERVICE_ID;
 
     console.log(`\n✨ Deployment complete.\n`);
-    console.log(`   Branding:  POST https://${instanceUrl}/api/${liveNamespace}/${liveServiceId}/branding`);
-    console.log(`   Revert:    POST https://${instanceUrl}/api/${liveNamespace}/${liveServiceId}/revert`);
+    console.log(`   Branding:  POST https://${rawHost}/api/${liveNamespace}/${liveServiceId}/branding`);
+    console.log(`   Revert:    POST https://${rawHost}/api/${liveNamespace}/${liveServiceId}/revert`);
     if (liveNamespace !== 'global') {
         console.log(`\n   ⚠️  Namespace landed as '${liveNamespace}' instead of 'global'.`);
         console.log('       The MCP expects /api/global/demo_orchestrator/... — re-run this script,');

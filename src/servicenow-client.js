@@ -266,45 +266,8 @@ export class ServiceNowClient {
       // First, get the update set name
       const updateSet = await this.getRecord('sys_update_set', updateSetSysId);
 
-      // Create axios client with UI session
-      const authHeader = await this.getAuthHeader();
-      const axiosWithCookies = axios.create({
-        baseURL: this.instanceUrl,
-        headers: {
-          'Authorization': authHeader,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'User-Agent': 'ServiceNow-MCP-Client/2.0'
-        },
-        withCredentials: true,
-        maxRedirects: 5
-      });
+      console.error(`Setting update set to: ${updateSet.name} via sys_trigger...`);
 
-      // Establish session first
-      await axiosWithCookies.get('/', {
-        headers: { 'Accept': 'text/html' }
-      });
-
-      // Set the update set via UI API
-      const response = await axiosWithCookies.put(
-        '/api/now/ui/concoursepicker/updateset',
-        {
-          name: updateSet.name,
-          sysId: updateSetSysId
-        }
-      );
-
-      return {
-        success: true,
-        update_set: updateSet.name,
-        sys_id: updateSetSysId,
-        response: response.data
-      };
-    } catch (error) {
-      // If UI API fails, fall back to sys_trigger method
-      console.log('UI API failed, falling back to sys_trigger...');
-
-      const updateSet = await this.getRecord('sys_update_set', updateSetSysId);
       const script = `// Update user preference for current update set
 var updateSetId = '${updateSetSysId}';
 
@@ -335,6 +298,8 @@ gs.info('✅ Update set changed to: ${updateSet.name}');`;
         method: 'sys_trigger',
         trigger_details: result
       };
+    } catch (error) {
+      throw new Error(`Failed to set current update set: ${error.message}`);
     }
   }
 
@@ -375,7 +340,7 @@ gs.info('✅ Update set changed to: ${updateSet.name}');`;
         }
       } catch (prefError) {
         // Previous scope query failed - not critical, continue
-        console.log('Could not retrieve previous scope:', prefError.message);
+        console.error('Could not retrieve previous scope:', prefError.message);
       }
 
       // Get application details
@@ -1043,10 +1008,10 @@ gs.info('✅ Update set changed to: ${updateSet.name}');`;
       const now = new Date();
       const nextAction = new Date(now.getTime() + 1000); // 1 second from now
 
-      // Format: YYYY-MM-DD HH:MM:SS
+      // Format: YYYY-MM-DD HH:MM:SS (UTC, since ServiceNow PDI servers use UTC/GMT for database time)
       const formatDateTime = (date) => {
         const pad = (n) => n.toString().padStart(2, '0');
-        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+        return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())} ${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())}:${pad(date.getUTCSeconds())}`;
       };
 
       // Wrap script with auto-delete logic if requested
@@ -1057,11 +1022,12 @@ gs.info('✅ Update set changed to: ${updateSet.name}');`;
         finalScript = script;  // Use original script for now
       }
 
-      // Create sys_trigger record
+      // Create sys_trigger record with next_action in the future to prevent the scheduler
+      // from running it before we successfully update it with the self-delete script.
       const trigger = await this.createRecord('sys_trigger', {
         name: `MCP_Script_${Date.now()}`,
         script: finalScript,
-        next_action: formatDateTime(nextAction),
+        next_action: '2035-01-01 00:00:00', // Far in the future
         trigger_type: '0', // Run once
         state: '0', // Ready state
         description: description || 'Automated script execution via MCP'
@@ -1083,7 +1049,9 @@ try {
 }`;
 
         await this.updateRecord('sys_trigger', trigger.sys_id, {
-          script: scriptWithDelete
+          script: scriptWithDelete,
+          next_action: '2020-01-01 00:00:00', // Set to past to run immediately!
+          state: '0'
         });
       }
 
@@ -1091,9 +1059,9 @@ try {
         success: true,
         trigger_sys_id: trigger.sys_id,
         trigger_name: trigger.name,
-        next_action: formatDateTime(nextAction),
+        next_action: '2020-01-01 00:00:00',
         auto_delete: autoDelete,
-        message: `Script scheduled to run at ${formatDateTime(nextAction)}. ${autoDelete ? 'Trigger will auto-delete after execution.' : 'Trigger will remain after execution.'}`
+        message: `Script scheduled to run at 2020-01-01 00:00:00. ${autoDelete ? 'Trigger will auto-delete after execution.' : 'Trigger will remain after execution.'}`
       };
     } catch (error) {
       throw new Error(`Failed to create script trigger: ${error.message}`);
