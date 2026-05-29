@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Orchestrator: Setup Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #0b1121;
+            --surface-color: rgba(15, 23, 42, 0.6);
+            --surface-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #cbd5e1;
+            --text-strong: #ffffff;
+            --table-header-bg: rgba(15, 23, 42, 0.8);
+            --table-alt-bg: rgba(255, 255, 255, 0.02);
+            --accent-teal: #00A3A1;
+            --accent-blue: #003366;
+            --accent-glow: rgba(0, 163, 161, 0.5);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(0, 163, 161, 0.08), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(0, 51, 102, 0.15), transparent 25%);
+            background-attachment: fixed;
+        }
+
+        h1, h2, h3 { font-family: 'Outfit', sans-serif; font-weight: 800; }
+
+        header { padding: 60px 20px 40px; text-align: center; }
+        .title-glow {
+            font-size: 3rem;
+            background: linear-gradient(90deg, #fff, var(--accent-teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        .subtitle { font-size: 1.1rem; color: var(--text-muted); max-width: 600px; margin: 0 auto; }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 20px 80px; display: flex; flex-direction: column; gap: 30px; }
+
+        section {
+            background: var(--surface-color);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--surface-border);
+            border-radius: 16px;
+            padding: 35px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        section h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid var(--surface-border);
+            padding-bottom: 15px;
+            color: #fff;
+        }
+
+        section h2 i { color: var(--accent-teal); }
+
+        .step-list { list-style: none; counter-reset: custom-counter; }
+        .step-list li {
+            position: relative;
+            padding-left: 50px;
+            margin-bottom: 25px;
+            counter-increment: custom-counter;
+        }
+        .step-list li::before {
+            content: counter(custom-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 32px;
+            height: 32px;
+            background: var(--accent-teal);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-family: 'Outfit', sans-serif;
+        }
+        .step-list h3 { font-size: 1.2rem; margin-bottom: 8px; color: #fff; }
+        .step-list p { color: var(--text-muted); margin-bottom: 10px; }
+        .step-list a { color: #38bdf8; text-decoration: none; font-weight: bold; }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.65);
+            border-radius: 12px;
+            padding: 24px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            color: #f8fafc; /* Brighter white/gray for better contrast */
+            white-space: pre-wrap;
+            border-left: 5px solid var(--accent-teal);
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 24px;
+            box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        .alert-box {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid #ef4444;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+        .alert-box h4 { color: #fca5a5; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
+
+        .mermaid-diagram-wrap {
+            margin: 24px 0 28px;
+            padding: 28px 20px 24px;
+            background: rgba(15, 23, 42, 0.55);
+            border: 1px solid var(--surface-border);
+            border-radius: 14px;
+            overflow-x: auto;
+        }
+        .mermaid-diagram-wrap .diagram-caption {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 16px;
+            max-width: 720px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .mermaid-diagram-wrap .diagram-caption strong { color: #e2e8f0; }
+        .mermaid svg { width: 100%; min-width: 900px; height: auto !important; }
+
+        .flow-overview {
+            margin: 24px 0 8px;
+            padding: 24px 20px;
+            background: rgba(15, 23, 42, 0.55);
+            border: 1px solid var(--surface-border);
+            border-radius: 14px;
+        }
+        .flow-intro {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin: 0 auto 22px;
+            max-width: 760px;
+        }
+        .flow-intro strong { color: var(--text-strong); }
+        .flow-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+        }
+        .flow-step {
+            position: relative;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            padding: 16px 14px 14px;
+            min-height: 100%;
+        }
+        .flow-step:not(:last-child)::after {
+            content: "\f061";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            top: 50%;
+            right: -12px;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 0.8rem;
+            z-index: 1;
+        }
+        .flow-step-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .flow-step-number {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--accent-teal);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+        .flow-step-context {
+            color: #94a3b8;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            text-align: right;
+        }
+        .flow-step h3 {
+            font-size: 1rem;
+            color: #fff;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .flow-step h3 i { color: var(--accent-teal); font-size: 0.95rem; }
+        .flow-step p {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            line-height: 1.45;
+            margin: 0;
+        }
+        .flow-handoff {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(148, 163, 184, 0.25);
+            color: #94a3b8;
+            font-size: 0.78rem;
+            line-height: 1.35;
+        }
+        .flow-handoff strong { color: var(--text-strong); font-weight: 600; }
+        @media (max-width: 900px) {
+            .flow-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .flow-step:nth-child(2)::after,
+            .flow-step:nth-child(4)::after { content: none; }
+        }
+        @media (max-width: 560px) {
+            .flow-grid { grid-template-columns: 1fr; }
+            .flow-step::after { content: none !important; }
+        }
+        body.light-mode {
+            --bg-color: #f8fafc;
+            --surface-color: rgba(255, 255, 255, 0.85);
+            --surface-border: rgba(148, 163, 184, 0.4);
+            --text-main: #0f172a;
+            --text-muted: #334155;
+            --text-strong: #0f172a;
+            --table-header-bg: rgba(241, 245, 249, 0.9);
+            --table-alt-bg: rgba(0, 0, 0, 0.03);
+        }
+        body.light-mode .title-glow {
+            background: linear-gradient(90deg, #0f172a, var(--accent-teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        body.light-mode section h2, 
+        body.light-mode .step-list h3,
+        body.light-mode .flow-step h3,
+        body.light-mode .mermaid-diagram-wrap .diagram-caption strong {
+            color: #0f172a;
+        }
+        body.light-mode .alert-box h4,
+        body.light-mode .challenge-heading {
+            color: #b91c1c;
+        }
+        body.light-mode .outcome-heading {
+            color: #047857;
+        }
+        body.light-mode .code-block {
+            background: #f1f5f9;
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            color: #334155;
+            box-shadow: none;
+        }
+        body.light-mode .flow-step {
+            background: rgba(255, 255, 255, 0.95);
+        }
+        body.light-mode .mermaid-diagram-wrap,
+        body.light-mode .flow-overview,
+        body.light-mode .arch-diagram-wrap {
+            background: rgba(248, 250, 252, 0.8);
+        }
+        .arch-diagram-wrap {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .arch-diagram-wrap .mermaid {
+            min-width: 720px;
+        }
+        .arch-diagram-wrap .mermaid svg {
+            width: 100%;
+            min-width: 720px;
+            height: auto !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div style="position: absolute; top: 20px; right: 20px;">
+        <button id="theme-toggle" style="background: var(--surface-color); border: 1px solid var(--surface-border); color: var(--text-main); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-family: 'Inter', sans-serif; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-sun"></i> Light Mode
+        </button>
+    </div>
+    <header>
+        <h1 class="title-glow">Setup Guide</h1>
+        <p class="subtitle">Install the MCP server, point Claude or Cursor at it, then seed demos from chat.</p>
+    </header>
+
+    <div class="container">
+
+        <!-- Introduction -->
+        <section>
+            <h2><i class="fa-solid fa-lightbulb" style="color: #f59e0b;"></i> Introduction: Intelligent Demo Orchestrator (IDO)</h2>
+            <p style="color: var(--text-muted); margin-bottom: 18px;">
+                The <strong>Intelligent Demo Orchestrator (IDO)</strong> is an AI-powered automation tool that transforms demo setup from <strong>days to minutes</strong>. It enables:
+            </p>
+            <ul style="color: var(--text-muted); padding-left: 20px; margin-bottom: 24px; line-height: 1.6;">
+                <li><strong>Rapid Provisioning:</strong> Instant system readiness.</li>
+                <li><strong>Realistic Data:</strong> Auto-populates industry-specific records.</li>
+                <li><strong>Tailored Context:</strong> Customizes categories, workflows, and use cases for clients.</li>
+            </ul>
+
+            <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 18px; margin-bottom: 12px; align-items: center;">
+                <h3 class="challenge-heading" style="color: #fca5a5; font-size: 1.1rem; margin: 0;"><i class="fa-solid fa-triangle-exclamation"></i>&nbsp; The Challenge (The Old Way)</h3>
+                <div style="width: 24px;"></div>
+                <h3 class="outcome-heading" style="color: #6ee7b7; font-size: 1.1rem; margin: 0;"><i class="fa-solid fa-check-circle"></i>&nbsp; Expected Outcomes (The New Way)</h3>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+                <!-- Row 1 -->
+                <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 18px; align-items: center;">
+                    <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 14px; height: 100%; display: flex; align-items: center;">
+                        <p style="color: var(--text-muted); font-size: 0.95rem; margin: 0;"><strong>High Manual Effort:</strong> Setup requires significant manual work.</p>
+                    </div>
+                    <div style="color: var(--text-muted); font-size: 1.2rem; text-align: center;"><i class="fa-solid fa-arrow-right"></i></div>
+                    <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 14px; height: 100%; display: flex; align-items: center;">
+                        <p style="color: var(--text-muted); font-size: 0.95rem; margin: 0;"><strong>Massive Time Reduction:</strong> Build times shrink from <strong>days to minutes</strong>.</p>
+                    </div>
+                </div>
+                <!-- Row 2 -->
+                <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 18px; align-items: center;">
+                    <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 14px; height: 100%; display: flex; align-items: center;">
+                        <p style="color: var(--text-muted); font-size: 0.95rem; margin: 0;"><strong>Resource Bottlenecks:</strong> Reliance on specialized technical resources.</p>
+                    </div>
+                    <div style="color: var(--text-muted); font-size: 1.2rem; text-align: center;"><i class="fa-solid fa-arrow-right"></i></div>
+                    <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 14px; height: 100%; display: flex; align-items: center;">
+                        <p style="color: var(--text-muted); font-size: 0.95rem; margin: 0;"><strong>Democratized Setup:</strong> Less dependency on technical experts.</p>
+                    </div>
+                </div>
+                <!-- Row 3 -->
+                <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 18px; align-items: center;">
+                    <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 14px; height: 100%; display: flex; align-items: center;">
+                        <p style="color: var(--text-muted); font-size: 0.95rem; margin: 0;"><strong>Inconsistent Quality:</strong> Manual processes introduce variability.</p>
+                    </div>
+                    <div style="color: var(--text-muted); font-size: 1.2rem; text-align: center;"><i class="fa-solid fa-arrow-right"></i></div>
+                    <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 14px; height: 100%; display: flex; align-items: center;">
+                        <p style="color: var(--text-muted); font-size: 0.95rem; margin: 0;"><strong>Consistency & Quality:</strong> Eliminates manual variability.</p>
+                    </div>
+                </div>
+                <!-- Row 4 -->
+                <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 18px; align-items: center;">
+                    <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 14px; height: 100%; display: flex; align-items: center;">
+                        <p style="color: var(--text-muted); font-size: 0.95rem; margin: 0;"><strong>Slow Turnaround:</strong> Takes several days to prepare a demo.</p>
+                    </div>
+                    <div style="color: var(--text-muted); font-size: 1.2rem; text-align: center;"><i class="fa-solid fa-arrow-right"></i></div>
+                    <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 14px; height: 100%; display: flex; align-items: center;">
+                        <p style="color: var(--text-muted); font-size: 0.95rem; margin: 0;"><strong>Reusable Framework:</strong> Extensible foundation for AI-driven enhancements.</p>
+                    </div>
+                </div>
+                <!-- Row 5 -->
+                <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 18px; align-items: center;">
+                    <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 14px; height: 100%; display: flex; align-items: center;">
+                        <p style="color: var(--text-muted); font-size: 0.95rem; margin: 0;"><strong>High Delivery Cost:</strong> Specialist setup time drives up costs.</p>
+                    </div>
+                    <div style="color: var(--text-muted); font-size: 1.2rem; text-align: center;"><i class="fa-solid fa-arrow-right"></i></div>
+                    <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 14px; height: 100%; display: flex; align-items: center;">
+                        <p style="color: var(--text-muted); font-size: 0.95rem; margin: 0;"><strong>Lower Cost:</strong> Reduces specialist bench time and rework per demo.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Catchy Outcomes One-Liner -->
+            <div style="margin-top: 25px; padding: 18px 24px; background: rgba(0, 163, 161, 0.1); border-radius: 10px; border: 1px solid rgba(0, 163, 161, 0.3); display: flex; align-items: flex-start; gap: 14px;">
+                <i class="fa-solid fa-bolt" style="color: #f59e0b; margin-top: 5px; font-size: 1.2rem;"></i> 
+                <p style="color: var(--text-main); font-size: 1.15rem; margin: 0; font-family: 'Inter', sans-serif; line-height: 1.6;">
+                    <strong style="color: var(--accent-teal);">Business impact:</strong> Mean time to demo drops from days to minutes, with less specialist effort per engagement and more consistent quality every time.
+                </p>
+            </div>
+        </section>
+
+<!-- Architecture overview -->
+        <section>
+            <h2><i class="fa-solid fa-sitemap" style="color: #38bdf8;"></i> How It Works</h2>
+            <div class="arch-diagram-wrap" style="text-align: center; margin: 24px 0; background: rgba(15, 23, 42, 0.55); border: 1px solid var(--surface-border); border-radius: 14px; padding: 20px; overflow-x: auto;">
+                <svg class="arch-diagram" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" width="100%" style="min-width:900px;max-width:1200px;height:auto;display:block;margin:0 auto;" role="img" aria-label="AI Demo Orchestrator flow"><rect width="1200" height="520" fill="#f8fafc" rx="12"/><defs><marker id="biz-arrow-solid" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#334155"/></marker><marker id="biz-arrow-teal" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#00A3A1"/></marker></defs><g transform="translate(48,200)"><circle cx="44" cy="44" r="44" fill="#1e293b"/><circle cx="44" cy="36" r="14" fill="#94a3b8"/><path d="M16 88c4-18 18-28 28-28s24 10 28 28" fill="#94a3b8"/><text x="44" y="118" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" font-weight="600" fill="#334155">User</text></g><line x1="140" y1="244" x2="218" y2="244" stroke="#334155" stroke-width="2.5" marker-end="url(#biz-arrow-solid)"/><rect x="138" y="195" width="88" height="34" rx="17" fill="#fff" stroke="#94a3b8" stroke-width="2"/><text x="182" y="218" text-anchor="middle" font-family="Inter,sans-serif" font-size="17" font-weight="700" fill="#0f172a">1. Prompt</text><rect x="228" y="72" width="340" height="376" rx="14" fill="#ecfdf5" stroke="#00A3A1" stroke-width="2"/><text x="248" y="108" font-family="Outfit,Inter,sans-serif" font-size="20" font-weight="800" fill="#0f766e">AI Demo Orchestrator</text><rect x="252" y="128" width="292" height="72" rx="10" fill="#0d9488"/><text x="272" y="158" font-family="Inter,sans-serif" font-size="16" font-weight="700" fill="#fff">Theme &amp; Branding Engine</text><text x="272" y="182" font-family="Inter,sans-serif" font-size="13" fill="#d1fae5">Logo, colors, portal CSS</text><rect x="252" y="220" width="292" height="72" rx="10" fill="#0d9488"/><text x="272" y="250" font-family="Inter,sans-serif" font-size="16" font-weight="700" fill="#fff">Contextual Data Synthesizer</text><text x="272" y="274" font-family="Inter,sans-serif" font-size="13" fill="#d1fae5">Personas, incidents, catalog</text><rect x="252" y="312" width="292" height="72" rx="10" fill="#0d9488"/><text x="272" y="342" font-family="Inter,sans-serif" font-size="16" font-weight="700" fill="#fff">Analytics Configurator</text><text x="272" y="366" font-family="Inter,sans-serif" font-size="13" fill="#d1fae5">Reports &amp; KPI widgets</text><rect x="720" y="72" width="452" height="376" rx="14" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/><text x="740" y="108" font-family="Outfit,Inter,sans-serif" font-size="20" font-weight="800" fill="#0f172a">ServiceNow Target Instance</text><rect x="744" y="128" width="404" height="72" rx="10" fill="#fff" stroke="#cbd5e1"/><text x="764" y="158" font-family="Inter,sans-serif" font-size="16" font-weight="700" fill="#0f172a">Fully Branded Portal</text><text x="764" y="182" font-family="Inter,sans-serif" font-size="13" fill="#475569">Logo, colors, CSS</text><rect x="744" y="220" width="404" height="72" rx="10" fill="#fff" stroke="#cbd5e1"/><text x="764" y="250" font-family="Inter,sans-serif" font-size="16" font-weight="700" fill="#0f172a">Industry-Specific Data</text><text x="764" y="274" font-family="Inter,sans-serif" font-size="13" fill="#475569">Personas, IT/HR incidents</text><rect x="744" y="312" width="404" height="72" rx="10" fill="#fff" stroke="#cbd5e1"/><text x="764" y="342" font-family="Inter,sans-serif" font-size="16" font-weight="700" fill="#0f172a">Live KPI Dashboard</text><text x="764" y="366" font-family="Inter,sans-serif" font-size="13" fill="#475569">Active metrics</text><line x1="544" y1="172" x2="744" y2="172" stroke="#00A3A1" stroke-width="3" stroke-dasharray="8 6" marker-end="url(#biz-arrow-teal)"/><rect x="562" y="118" width="196" height="40" rx="20" fill="#fff" stroke="#00A3A1" stroke-width="3"/><text x="660" y="145" text-anchor="middle" font-family="Inter,sans-serif" font-size="18" font-weight="800" fill="#0f172a">2. Generates Visuals</text><line x1="544" y1="256" x2="744" y2="256" stroke="#00A3A1" stroke-width="2.5" stroke-dasharray="8 6" marker-end="url(#biz-arrow-teal)"/><rect x="552" y="222" width="216" height="34" rx="17" fill="#fff" stroke="#00A3A1" stroke-width="2"/><text x="660" y="245" text-anchor="middle" font-family="Inter,sans-serif" font-size="17" font-weight="700" fill="#0f172a">3. Seeds Realistic Data</text><line x1="544" y1="348" x2="744" y2="348" stroke="#00A3A1" stroke-width="2.5" stroke-dasharray="8 6" marker-end="url(#biz-arrow-teal)"/><rect x="558" y="314" width="204" height="34" rx="17" fill="#fff" stroke="#00A3A1" stroke-width="2"/><text x="660" y="337" text-anchor="middle" font-family="Inter,sans-serif" font-size="17" font-weight="700" fill="#0f172a">4. Configures Metrics</text></svg>
+            </div>
+        </section>
+
+        <!-- Hybrid Architecture -->
+        <section>
+            <h2><i class="fa-solid fa-layer-group" style="color: #8b5cf6;"></i> 1. Hybrid Architecture (Split Runtime)</h2>
+            <p style="color: var(--text-muted); margin-bottom: 18px;">The orchestrator is split across two runtimes so each side does what it's good at. You don't need to memorize this — but understanding it explains why deployment has two artifacts.</p>
+
+            <div class="mermaid-diagram-wrap" style="margin-top: 20px;">
+                <div class="mermaid">
+flowchart TB
+    classDef laptop fill:#00A3A115,stroke:#00A3A1,stroke-width:2px,color:#f8fafc;
+    classDef snow fill:#3b82f615,stroke:#3b82f6,stroke-width:2px,color:#f8fafc;
+    
+    subgraph L["On your laptop"]
+        MCP["<b>🔌 MCP server (Node.js)</b><br/><br/>Owns orchestration, validation, idempotency.<br/>Talks to ServiceNow over REST.<br/><i>Users, Incidents, Catalog, Update Sets</i>"]
+    end
+    
+    subgraph S["On your instance"]
+        SNOW["<b>☁️ Script Include + Scripted REST</b><br/><br/>Owns what genuinely needs Glide.<br/>Called by the MCP over HTTP.<br/><i>CSS Regex Injection & Bulk Teardowns</i>"]
+    end
+    
+    MCP:::laptop
+    SNOW:::snow
+    
+    MCP <-->|"HTTP REST"| SNOW
+                </div>
+            </div>
+            
+            <p style="color: var(--text-muted); font-size: 0.92rem; margin: 10px 0 10px 0;"><strong style="color: var(--text-strong);">Why split?</strong> Bulk delete and CSS regex are dramatically faster as one server-side transaction than as N REST calls. Everything else is just as cheap (and far easier to debug) over REST.</p>
+            <p style="color: var(--text-muted); font-size: 0.92rem; margin: 0 0 6px 0;"><strong style="color: var(--text-strong);">Dashboard injection — first-column traversal:</strong> Instead of hardcoding <code>sys_id</code> references, the MCP traverses the portal layout dynamically:</p>
+            <ol style="color: var(--text-muted); font-size: 0.92rem; padding-left: 22px; margin: 0;">
+                <li>Queries <code>sp_page</code> where <code>id</code> is <code>index</code> (or whatever <code>pageId</code> the caller specifies).</li>
+                <li>Queries <code>sp_column</code> with <code>sp_row.sp_container.sp_page=&lt;page&gt;^ORDERBYorder</code>, <code>limit 1</code>, to find the primary content column (top order).</li>
+                <li>Creates an <code>sp_instance</code> record mapping the target widget (e.g. <code>demo_kpi_dashboard</code>) to that column. The <code>sp_widget</code> records themselves must already exist on the instance — Update Set / scoped app — the MCP only manages bindings.</li>
+            </ol>
+        </section>
+
+<!-- Prerequisites -->
+        <section>
+            <h2><i class="fa-solid fa-list-check"></i> 2. Prerequisites</h2>
+            <ul class="step-list">
+                <li>
+                    <h3>Node.js</h3>
+                    <p>Install Node.js <strong>18+</strong> from <a href="https://nodejs.org" target="_blank">nodejs.org</a>.</p>
+                </li>
+                <li>
+                    <h3>Claude or Cursor (desktop)</h3>
+                    <p>MCP needs the desktop app: <a href="https://claude.ai/download" target="_blank" rel="noopener noreferrer">Claude</a> or <a href="https://cursor.com" target="_blank" rel="noopener noreferrer">Cursor</a>. <strong>Accenture:</strong> <a href="https://myasg.accenture.com/agent-powered/getting-started/cursor/" target="_blank" rel="noopener noreferrer">Get Cursor on myASG</a>.</p>
+                </li>
+                <li>
+                    <h3>ServiceNow instance</h3>
+                    <p>A developer or sub-prod instance where you can sign in as <code>admin</code> (or equivalent) to deploy the scripted REST pieces.</p>
+                </li>
+            </ul>
+        </section>
+
+        <!-- MCP Server -->
+        <section>
+            <h2><i class="fa-brands fa-node-js" style="color: #8b5cf6;"></i> 3. The Local MCP Server</h2>
+            <ul class="step-list">
+                <li>
+                    <h3>Clone and install</h3>
+                    <p><a href="https://github.com/vbiyani3107/demoenvservicenowmcp" target="_blank" rel="noopener noreferrer">demoenvservicenowmcp</a> — clone it, then in that folder:</p>
+                    <div class="code-block">git clone https://github.com/vbiyani3107/demoenvservicenowmcp
+cd demoenvservicenowmcp
+npm install</div>
+                </li>
+                <li>
+                    <h3>Set your ServiceNow login</h3>
+                    <p>Open <code>config/servicenow-instances.json</code>. Under <code>instances</code>, edit the <strong>dev</strong> entry: set <code>url</code> (full <code>https://…</code> URL), <code>username</code>, and <code>password</code>. Save the file. Use the same values in the next section’s <code>SERVICENOW_*</code> env vars when you register the MCP server.</p>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Claude/Cursor Config -->
+        <section>
+            <h2><i class="fa-solid fa-robot" style="color: #d97757;"></i> 4. Claude/Cursor Configuration</h2>
+            <ul class="step-list">
+                <li>
+                    <h3>Open your MCP config file</h3>
+                    <p><strong>Claude Desktop:</strong> <code>%APPDATA%\Claude\claude_desktop_config.json</code> (Windows) or <code>~/Library/Application Support/Claude/claude_desktop_config.json</code> (Mac).</p>
+                    <p><strong>Cursor:</strong> <code>~/.cursor/mcp.json</code> or the project’s <code>.cursor/mcp.json</code> (or Settings → Features → MCP).</p>
+                </li>
+                <li>
+                    <h3>Register this MCP server</h3>
+                    <p>Add an entry that runs Node on this repo’s <code>src/stdio-server.js</code> (replace with the <strong>absolute path</strong> to your clone). Include ServiceNow login in <code>env</code> — use the same URL, username, and password as in step 2.</p>
+                    <div class="code-block">{
+  "mcpServers": {
+    "servicenow-demo": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/demoenvservicenowmcp/src/stdio-server.js"
+      ],
+      "env": {
+        "SERVICENOW_INSTANCE_URL": "https://YOUR_INSTANCE.service-now.com",
+        "SERVICENOW_USERNAME": "admin",
+        "SERVICENOW_PASSWORD": "YOUR_PASSWORD"
+      }
+    }
+  }
+}</div>
+                    <p style="color: var(--text-muted); font-size: 0.92rem; margin-top: 10px;"><strong style="color: #cbd5e1;">Env-only setup:</strong> If you prefer not to use <code>servicenow-instances.json</code>, remove or rename that file and rely on these three variables (or the same names in a root <code>.env</code>). With the default repo layout, the server reads <code>config/servicenow-instances.json</code> first — keep values aligned with <code>env</code> so nothing drifts.</p>
+                </li>
+                
+                <li>
+                    <h3>Restart and check</h3>
+                    <p>Quit and reopen Claude or Cursor. Start a chat and ask it to list ServiceNow tools — you should see tools like <code>SN-Deploy-Demo</code>.</p>
+                </li>
+
+            </ul>
+        </section>
+
+        <!-- ServiceNow Backend -->
+        <section>
+            <h2><i class="fa-solid fa-cloud"></i> 5. ServiceNow Backend (Script Include + Scripted REST API)</h2>
+            <p style="color: var(--text-muted); margin-bottom: 18px;">Use the copy prompt in Claude or Cursor first. Only use the script if you want to deploy from the terminal.</p>
+            <ul class="step-list">
+                <li>
+                    <h3>Deploy from Claude or Cursor (recommended)</h3>
+                    <p>Click <strong>Copy Prompt</strong>, paste into chat, and run it so the Script Include and Scripted REST API get created on your instance.</p>
+                    <div style="position: relative;">
+                        <button onclick="navigator.clipboard.writeText(document.getElementById('js-code').innerText); this.innerText='Copied!'; setTimeout(()=>this.innerText='Copy Prompt', 2000);" style="position: absolute; top: 10px; right: 10px; background: var(--accent-teal); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-family: 'Outfit'; font-weight: bold;">Copy Prompt</button>
+                        <div class="code-block" style="max-height: 500px; overflow-y: auto;" id="js-code">Please create the following two artifacts in my ServiceNow instance.
+
+ARTIFACT 1 — Script Include
+- Name: DemoOrchestratorAPI
+- Application Scope: Global
+- Client Callable: false
+- Active: true
+
+Use exactly this script body:
+
+var DemoOrchestratorAPI = Class.create();
+DemoOrchestratorAPI.prototype = {
+    initialize: function() {},
+
+    /**
+     * Apply visual branding to all Service Portals.
+     *
+     * @param {Object} demoConfig
+     *   {
+     *     clientName:        String  (used for logo file name)
+     *     primaryColor:      String  hex, default '#00A3A1'
+     *     secondaryColor:    String  hex, default '#003366'
+     *     navbarBgColor:     String? hex, defaults to secondaryColor
+     *     navbarTextColor:   String? hex, default '#ffffff'
+     *     logoUrl:           String? a pre-existing URL (skips upload)
+     *     logoBase64:        String? raw base64 payload (no data: prefix)
+     *     logoMimeType:      String? e.g. 'image/png' (default)
+     *   }
+     * @returns {Object} { ok, themesUpdated, logoSysId?, logoUrl?, errors[] }
+     */
+    applyBranding: function(demoConfig) {
+        var result = { ok: true, themesUpdated: 0, errors: [] };
+        if (!demoConfig) {
+            result.ok = false;
+            result.errors.push('demoConfig is required');
+            return result;
+        }
+
+        var primaryColor = demoConfig.primaryColor || '#00A3A1';
+        var secondaryColor = demoConfig.secondaryColor || '#003366';
+        var navBg = demoConfig.navbarBgColor || secondaryColor || primaryColor;
+        var navText = demoConfig.navbarTextColor || '#ffffff';
+        var finalLogoUrl = demoConfig.logoUrl || '';
+
+        // Tolerate the older widget contract where the whole data: URI is sent
+        // through logoUrl. Split it back into mime + base64 and route into the
+        // upload branch below.
+        if (finalLogoUrl.indexOf('data:image') === 0 && finalLogoUrl.indexOf('base64,') > -1) {
+            var parts = finalLogoUrl.split('base64,');
+            demoConfig.logoMimeType = parts[0].replace('data:', '').replace(/;\s*$/, '');
+            demoConfig.logoBase64 = parts[1];
+            finalLogoUrl = '';
+        }
+
+        if (!finalLogoUrl && demoConfig.logoBase64) {
+            try {
+                var mimeType = demoConfig.logoMimeType || 'image/png';
+                var extension = (mimeType.split('/')[1] || 'png').replace(/[^a-z0-9]/gi, '');
+                var safeClient = (demoConfig.clientName || 'demo').replace(/\s+/g, '_').toLowerCase();
+                var fileName = 'demo_logo_' + safeClient + '.' + extension;
+                var dummyPortal = new GlideRecord('sp_portal');
+                dummyPortal.query();
+                if (dummyPortal.next()) {
+                    var sa = new GlideSysAttachment();
+                    var attachSysId = sa.writeBase64(dummyPortal, fileName, mimeType, demoConfig.logoBase64);
+                    if (attachSysId) {
+                        finalLogoUrl = '/sys_attachment.do?sys_id=' + attachSysId;
+                        result.logoSysId = attachSysId;
+                        gs.info('[BRANDING] Stored Base64 upload as sys_attachment: ' + attachSysId);
+                    } else {
+                        result.errors.push('GlideSysAttachment.writeBase64 returned no sys_id');
+                    }
+                } else {
+                    result.errors.push('No sp_portal record found to host the logo attachment');
+                }
+            } catch (ex) {
+                result.errors.push('Base64 logo upload failed: ' + ex);
+            }
+        }
+        if (finalLogoUrl) result.logoUrl = finalLogoUrl;
+
+        var css = this._buildBrandingCss(finalLogoUrl, primaryColor, secondaryColor, navBg, navText);
+
+        var portalGR = new GlideRecord('sp_portal');
+        portalGR.query();
+        while (portalGR.next()) {
+            var themeSysId = portalGR.getValue('theme');
+            if (!themeSysId) continue;
+            var themeGR = new GlideRecord('sp_theme');
+            if (themeGR.get(themeSysId)) {
+                try {
+                    var current = themeGR.getValue('css_variables') || '';
+                    current = current.replace(
+                        /\/\* -- DEMO MASTER OVERRIDE -- \*\/[\s\S]*?\/\* -- END DEMO MASTER OVERRIDE -- \*\//g,
+                        ''
+                    );
+                    themeGR.setValue('css_variables', current + css);
+                    themeGR.update();
+                    result.themesUpdated++;
+                } catch (e) {
+                    result.errors.push('Theme update failed for ' + themeGR.getValue('name') + ': ' + e);
+                }
+            }
+        }
+
+        if (result.errors.length > 0) result.ok = false;
+        gs.info('[BRANDING] Branding applied. Themes updated: ' + result.themesUpdated);
+        return result;
+    },
+
+    _buildBrandingCss: function(finalLogoUrl, primaryColor, secondaryColor, navBg, navText) {
+        var logoBlock = '';
+        if (finalLogoUrl) {
+            logoBlock =
+                '.navbar-brand img, .sp-navbar-logo img, .navbar-logo img { display: none !important; }\n' +
+                '.navbar-brand, .sp-navbar-logo, .navbar-logo {\n' +
+                "    background-image: url('" + finalLogoUrl + "') !important;\n" +
+                '    background-size: contain !important;\n' +
+                '    background-repeat: no-repeat !important;\n' +
+                '    background-position: center left !important;\n' +
+                '    height: 50px !important;\n' +
+                '    width: 200px !important;\n' +
+                '    min-width: 200px !important;\n' +
+                '    display: block !important;\n' +
+                '}\n';
+        }
+
+        return (
+            '\n/* -- DEMO MASTER OVERRIDE -- */\n' +
+            logoBlock +
+            'a, .text-primary, .color-primary, .text-info, .panel-title a, .accordion-toggle, .sp-icon-link .fa, .announcement-title, .btn-link, button.btn-link {\n' +
+            '    color: ' + primaryColor + ' !important;\n' +
+            '}\n' +
+            '.bg-primary, .btn-primary, .icon-link-background-primary, .sn-va-widget-icon, .sn-connect-icon, .sp-chat-button, .sn-vabr_chat-btn {\n' +
+            '    background-color: ' + primaryColor + ' !important;\n' +
+            '    border-color: ' + primaryColor + ' !important;\n' +
+            '}\n' +
+            '.icon-link-background-primary { color: #fff !important; }\n' +
+            '.navbar, .navbar-inverse, .sp-navbar { background-color: ' + navBg + ' !important; }\n' +
+            '.navbar-inverse .navbar-nav > li > a, .navbar-inverse .navbar-brand { color: ' + navText + ' !important; transition: all 0.2s ease !important; }\n' +
+            '.navbar-inverse .navbar-nav > li > a:hover, .navbar-inverse .navbar-nav > li > a:focus, .navbar-inverse .navbar-brand:hover, .sp-navbar .navbar-nav > li > a:hover, .header-menu-item > a:hover { color: ' + primaryColor + ' !important; background-color: rgba(0,0,0,0.03) !important; }\n' +
+            '$brand-primary: ' + primaryColor + ';\n' +
+            '$brand-info: ' + primaryColor + ';\n' +
+            '$navbar-inverse-bg: ' + navBg + ';\n' +
+            '$navbar-inverse-link-color: ' + navText + ';\n' +
+            '$navbar-inverse-link-hover-color: ' + primaryColor + ';\n' +
+            '$link-color: ' + primaryColor + ';\n' +
+            '$sp-logo-margin-x: 15px;\n' +
+            ':root {\n' +
+            '    --now-color_brand--primary: ' + primaryColor + ';\n' +
+            '    --now-color_brand--secondary: ' + secondaryColor + ';\n' +
+            '    --now-color_chrome--brand: ' + primaryColor + ';\n' +
+            '    --now-color_chrome--divider: ' + primaryColor + ';\n' +
+            '}\n' +
+            '/* -- END DEMO MASTER OVERRIDE -- */\n'
+        );
+    },
+
+    /**
+     * Bulk teardown of all prefixed demo records and strip CSS overrides.
+     * Uses deleteMultiple() so the round-trip cost is one transaction per
+     * table instead of N REST DELETEs.
+     *
+     * @param {String} clientPrefix e.g. 'CompanyA'
+     * @returns {Object} {
+     *   ok,
+     *   deleted: { catalogItems, categories, users, incidents,
+     *              hrCases, purchaseOrders, reports, spInstances },
+     *   themesCleaned, heroContainersReset, errors[]
+     * }
+     */
+    revertByPrefix: function(clientPrefix) {
+        var result = {
+            ok: true,
+            deleted: {
+                catalogItems: 0,
+                categories: 0,
+                users: 0,
+                incidents: 0,
+                hrCases: 0,
+                purchaseOrders: 0,
+                reports: 0,
+                spInstances: 0
+            },
+            themesCleaned: 0,
+            heroContainersReset: 0,
+            errors: []
+        };
+        if (!clientPrefix) {
+            result.ok = false;
+            result.errors.push('clientPrefix is required');
+            return result;
+        }
+
+        gs.info('[TEARDOWN] Reverting demo data for: ' + clientPrefix);
+
+        try {
+            var itemGR = new GlideRecord('sc_cat_item');
+            itemGR.addQuery('name', 'STARTSWITH', clientPrefix + ' -');
+            itemGR.query();
+            result.deleted.catalogItems = itemGR.getRowCount();
+            itemGR.deleteMultiple();
+        } catch (e) { result.errors.push('Catalog items: ' + e); }
+
+        try {
+            var catGR = new GlideRecord('sc_category');
+            catGR.addQuery('title', 'STARTSWITH', clientPrefix + ' -');
+            catGR.query();
+            result.deleted.categories = catGR.getRowCount();
+            catGR.deleteMultiple();
+        } catch (e) { result.errors.push('Categories: ' + e); }
+
+        try {
+            var userPrefix = clientPrefix.split('-')[0].toLowerCase() + '_';
+            var userGR = new GlideRecord('sys_user');
+            userGR.addQuery('user_name', 'STARTSWITH', userPrefix);
+            userGR.query();
+            result.deleted.users = userGR.getRowCount();
+            userGR.deleteMultiple();
+        } catch (e) { result.errors.push('Users: ' + e); }
+
+        try {
+            var incGR = new GlideRecord('incident');
+            incGR.addQuery('correlation_id', 'STARTSWITH', clientPrefix + '_');
+            incGR.query();
+            result.deleted.incidents = incGR.getRowCount();
+            incGR.deleteMultiple();
+        } catch (e) { result.errors.push('Incidents: ' + e); }
+
+        // HR cases — table only exists when HRSD plugin is active. Wrap so a
+        // missing table reports a soft error instead of aborting the whole revert.
+        try {
+            var hrcGR = new GlideRecord('sn_hr_core_case');
+            if (hrcGR.isValid()) {
+                hrcGR.addQuery('correlation_id', 'STARTSWITH', clientPrefix + '_hrc_');
+                hrcGR.query();
+                result.deleted.hrCases = hrcGR.getRowCount();
+                hrcGR.deleteMultiple();
+            }
+        } catch (e) { result.errors.push('HR cases: ' + e); }
+
+        // Purchase orders — Procurement plugin gated, same pattern as HR cases.
+        try {
+            var poGR = new GlideRecord('proc_po');
+            if (poGR.isValid()) {
+                poGR.addQuery('correlation_id', 'STARTSWITH', clientPrefix + '_po_');
+                poGR.query();
+                result.deleted.purchaseOrders = poGR.getRowCount();
+                poGR.deleteMultiple();
+            }
+        } catch (e) { result.errors.push('Purchase orders: ' + e); }
+
+        try {
+            var rptGR = new GlideRecord('sys_report');
+            rptGR.addQuery('title', 'STARTSWITH', clientPrefix + ' -');
+            rptGR.query();
+            result.deleted.reports = rptGR.getRowCount();
+            rptGR.deleteMultiple();
+        } catch (e) { result.errors.push('Reports: ' + e); }
+
+        // Service Portal widget instances created by SN-Demo-Apply-Dashboard
+        // are stamped with class_name='demo-<clientPrefix>' (the real
+        // Bootstrap-class hook on sp_instance — sp_instance has NO css_class
+        // field; addQuery on a missing field silently no-ops and would delete
+        // the entire table). We sweep by exact prefix on class_name.
+        try {
+            var spiGR = new GlideRecord('sp_instance');
+            spiGR.addQuery('class_name', 'STARTSWITH', 'demo-' + clientPrefix);
+            spiGR.query();
+            result.deleted.spInstances = spiGR.getRowCount();
+            spiGR.deleteMultiple();
+        } catch (e) { result.errors.push('Widget instances: ' + e); }
+
+        try {
+            var portalGR = new GlideRecord('sp_portal');
+            portalGR.query();
+            while (portalGR.next()) {
+                var themeSysId = portalGR.getValue('theme');
+                if (!themeSysId) continue;
+                var themeGR = new GlideRecord('sp_theme');
+                if (themeGR.get(themeSysId)) {
+                    var currentCss = themeGR.getValue('css_variables') || '';
+                    var cleanedCss = currentCss.replace(
+                        /\/\* -- DEMO MASTER OVERRIDE -- \*\/[\s\S]*?\/\* -- END DEMO MASTER OVERRIDE -- \*\//g,
+                        ''
+                    );
+                    if (cleanedCss !== currentCss) {
+                        themeGR.setValue('css_variables', cleanedCss);
+                        themeGR.update();
+                        result.themesCleaned++;
+                    }
+                }
+            }
+        } catch (e) { result.errors.push('Theme cleanup: ' + e); }
+
+        // Hero container background — restore to empty for the index page's first
+        // container. We deliberately do NOT hard-code an instance-specific stock
+        // sys_id; '' is the safe, portable default.
+        try {
+            var pageGR = new GlideRecord('sp_page');
+            pageGR.addQuery('id', 'index');
+            pageGR.query();
+            while (pageGR.next()) {
+                var contGR = new GlideRecord('sp_container');
+                contGR.addQuery('sp_row.sp_page', pageGR.getUniqueValue());
+                contGR.orderBy('order');
+                contGR.setLimit(1);
+                contGR.query();
+                if (contGR.next()) {
+                    var bgImg = contGR.getValue('background_image') || '';
+                    var bgColor = contGR.getValue('background_color') || '';
+                    if (bgImg || bgColor) {
+                        contGR.setValue('background_image', '');
+                        contGR.setValue('background_color', '');
+                        contGR.update();
+                        result.heroContainersReset++;
+                    }
+                }
+            }
+        } catch (e) { result.errors.push('Hero container reset: ' + e); }
+
+        if (result.errors.length > 0) result.ok = false;
+        gs.info('[TEARDOWN] Complete for ' + clientPrefix + '. Deleted: ' + JSON.stringify(result.deleted));
+        return result;
+    },
+
+    type: 'DemoOrchestratorAPI'
+};
+
+ARTIFACT 2 — Scripted REST API
+- Name: Demo Orchestrator
+- API ID: demo_orchestrator
+- Active: true
+- Consumes / Produces: application/json
+
+With these two POST resources (both authenticated, no ACL):
+
+Resource A — applyBranding
+- HTTP method: POST
+- Relative path: /branding
+- Operation script:
+
+(function process(request, response) {
+    try {
+        var body = request.body && request.body.data ? request.body.data : {};
+        var api = new DemoOrchestratorAPI();
+        var result = api.applyBranding(body);
+        response.setStatus(result && result.ok === false ? 207 : 200);
+        response.setContentType('application/json');
+        response.setBody(result);
+    } catch (e) {
+        response.setStatus(500);
+        response.setContentType('application/json');
+        response.setBody({ ok: false, error: String(e) });
+    }
+})(request, response);
+
+Resource B — revertByPrefix
+- HTTP method: POST
+- Relative path: /revert
+- Operation script:
+
+(function process(request, response) {
+    try {
+        var body = request.body && request.body.data ? request.body.data : {};
+        var prefix = body.clientPrefix || body.prefix || '';
+        var api = new DemoOrchestratorAPI();
+        var result = api.revertByPrefix(prefix);
+        response.setStatus(result && result.ok === false ? 207 : 200);
+        response.setContentType('application/json');
+        response.setBody(result);
+    } catch (e) {
+        response.setStatus(500);
+        response.setContentType('application/json');
+        response.setBody({ ok: false, error: String(e) });
+    }
+})(request, response);
+
+When you're done, the MCP server will be able to call:
+  POST https://&lt;your-instance&gt;/api/global/demo_orchestrator/branding
+  POST https://&lt;your-instance&gt;/api/global/demo_orchestrator/revert
+</div>
+                    </div>
+                </li>
+                <li>
+                    <h3>Optional: deploy from the terminal</h3>
+                    <p>Create <code>.env</code> from <code>.env.example</code> and fill in your instance and password. From the repo folder run:</p>
+                    <div class="code-block">node scripts/deploy_script_include.cjs</div>
+                </li>
+
+            </ul>
+        </section>
+
+        
+        <!-- The Prompt -->
+        <section>
+            <h2><i class="fa-solid fa-play" style="color: #10b981;"></i> 6. Running the Engine</h2>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">Ask Claude or Cursor in plain language to deploy or extend a demo — it calls the ServiceNow tools for you.</p>
+
+            <details style="margin-bottom: 20px; background: rgba(255,255,255,0.03); border: 1px solid var(--surface-border); border-radius: 8px; padding: 12px 16px;">
+                <summary style="cursor: pointer; color: var(--text-main); font-family: 'Outfit'; font-weight: 600;">Available demo tools</summary>
+                <div style="color: var(--text-muted); font-size: 0.92rem; margin-top: 12px;">
+                    <p style="margin-bottom: 6px;"><strong style="color: var(--text-strong);"><code>SN-Deploy-Demo</code></strong> — one-call umbrella. Composes everything below in a single payload. Use this 95% of the time.</p>
+                    <p style="margin-bottom: 6px;">For surgical edits Claude can also call any of these directly:</p>
+                    <ul style="padding-left: 20px;">
+                        <li><code>SN-Demo-Apply-Branding</code> — visual branding (CSS + base64 logo + optional hero container background)</li>
+                        <li><code>SN-Demo-Apply-Personas</code> — users + roles</li>
+                        <li><code>SN-Demo-Apply-Data</code> — incidents, plus optional HR cases (sn_hr_core_case) and purchase orders (proc_po), plugin-gated</li>
+                        <li><code>SN-Demo-Apply-Catalog</code> — categories + catalog items + variables + choices</li>
+                        <li><code>SN-Demo-Apply-Widget-Overrides</code> — relabel sp_instance widget titles</li>
+                        <li><code>SN-Demo-Apply-Reports</code> — sys_report rows used by demo dashboards (idempotent on title)</li>
+                        <li><code>SN-Demo-Apply-Dashboard</code> — bind existing <code>sp_widget</code> records to the index page's first column as <code>sp_instance</code> rows; clientPrefix-stamped for clean revert</li>
+                        <li><code>SN-Demo-Revert</code> — bulk teardown by clientPrefix (server-side <code>deleteMultiple()</code>)</li>
+                    </ul>
+                </div>
+            </details>
+            
+            <p style="color: var(--text-muted); margin-bottom: 14px;"><strong style="color: var(--text-strong);">Logo:</strong> Attach the desired logo to the chat when you run the prompts below.</p>
+
+            <h3><i class="fa-solid fa-bolt" style="color: #10b981;"></i> McDonald's demo prompt</h3>
+            <p style="color: var(--text-muted); margin-bottom: 10px;">Copy into Claude or Cursor to deploy the McDonald's Restaurant Operations demo with branding and data in one pass.</p>
+            <div style="position: relative; margin-bottom: 24px;">
+                <button onclick="navigator.clipboard.writeText(document.getElementById('mcd-prompt').innerText); this.innerText='Copied!'; setTimeout(()=>this.innerText='Copy Prompt', 2000);" style="position: absolute; top: 10px; right: 10px; background: #10b981; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-family: 'Outfit'; font-weight: bold;">Copy Prompt</button>
+                <div class="code-block" style="border-left-color: #10b981;" id="mcd-prompt">Set up a ServiceNow demo for McDonald's Restaurant Operations (fast food / restaurant ops)
+
+Logo: Use the attached McDonald's logo and apply it on all pages — Service Portal, Unified Navigation / workspace chrome, classic UI (incidents, requested items, etc.), and primary company branding — not portal-only.
+
+Branding: #DA291C primary, #FFC72C secondary, red hero/nav with white text.
+
+Data: Catalog categories Restaurant Operations, Employee Services, Equipment Maintenance; items (uniform, POS issue, kiosk repair, schedule update, plus realistic extras); 6+ demo users with @us.mcd.com emails; 5+ realistic open incidents (MCD_ correlation IDs); sample catalog requests; dashboard widgets for open requests by category, incident trends, and active incidents.
+
+Deploy in one payload (clientPrefix MCD), verify portal + classic/unified nav, and report what was created and any logo surfaces that could not be updated.</div>
+            </div>
+
+            <h3><i class="fa-solid fa-store" style="color: #3b82f6;"></i> Walmart demo prompt</h3>
+            <p style="color: var(--text-muted); margin-bottom: 10px;">Copy into Claude or Cursor to deploy a Walmart Retail Operations demo with branding and data.</p>
+            <div style="position: relative; margin-bottom: 24px;">
+                <button onclick="navigator.clipboard.writeText(document.getElementById('wmt-prompt').innerText); this.innerText='Copied!'; setTimeout(()=>this.innerText='Copy Prompt', 2000);" style="position: absolute; top: 10px; right: 10px; background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-family: 'Outfit'; font-weight: bold;">Copy Prompt</button>
+                <div class="code-block" style="border-left-color: #3b82f6;" id="wmt-prompt">Set up a ServiceNow demo for Walmart Retail Operations.
+
+Logo: Use the attached Walmart logo and apply it on all pages — Service Portal, Unified Navigation, classic UI, and primary company branding.
+
+Branding: #0071CE primary, #FFC220 secondary, blue hero/nav with white text.
+
+Data: Catalog categories Retail Operations, Store Support, Supply Chain; items (POS issue, shelf restock, scanner repair, inventory inquiry); 6+ demo users with @walmart.com emails; 5+ realistic open incidents (WMT_ correlation IDs); sample catalog requests; dashboard widgets for open requests by category, incident trends, and active incidents.
+
+Deploy in one payload (clientPrefix WMT), verify portal + classic/unified nav, and report what was created.</div>
+            </div>
+
+            <h3><i class="fa-solid fa-briefcase-medical" style="color: #06b6d4;"></i> Healthcare demo prompt</h3>
+            <p style="color: var(--text-muted); margin-bottom: 10px;">Copy into Claude or Cursor to deploy a generalized Healthcare Hospital Operations demo.</p>
+            <div style="position: relative; margin-bottom: 24px;">
+                <button onclick="navigator.clipboard.writeText(document.getElementById('med-prompt').innerText); this.innerText='Copied!'; setTimeout(()=>this.innerText='Copy Prompt', 2000);" style="position: absolute; top: 10px; right: 10px; background: #06b6d4; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-family: 'Outfit'; font-weight: bold;">Copy Prompt</button>
+                <div class="code-block" style="border-left-color: #06b6d4;" id="med-prompt">Set up a ServiceNow demo for General Healthcare Hospital Operations.
+
+Logo: Use the attached Healthcare logo and apply it on all pages — Service Portal, Unified Navigation, classic UI, and primary company branding.
+
+Branding: #005A9C primary, #E31837 secondary, blue hero/nav with white text.
+
+Data: Catalog categories Clinical Equipment, IT Support, Facilities; items (MRI maintenance, charting software issue, secure access request, patient room repair); 6+ demo users with @hospital.org emails; 5+ realistic open incidents (MED_ correlation IDs); sample catalog requests; dashboard widgets for open requests by category, incident trends, and active incidents.
+
+Deploy in one payload (clientPrefix MED), verify portal + classic/unified nav, and report what was created.</div>
+            </div>
+
+            <h3><i class="fa-solid fa-rotate-left" style="color: #ef4444;"></i> Delete a demo</h3>
+            <p style="color: var(--text-muted); margin-bottom: 10px;">Copy into Claude or Cursor to remove a deployed demo. (Replace PREFIX with your client prefix e.g., MCD, WMT, MED).</p>
+            <div style="position: relative;">
+                <button onclick="navigator.clipboard.writeText(document.getElementById('generic-delete-prompt').innerText); this.innerText='Copied!'; setTimeout(()=>this.innerText='Copy Prompt', 2000);" style="position: absolute; top: 10px; right: 10px; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-family: 'Outfit'; font-weight: bold;">Copy Prompt</button>
+                <div class="code-block" style="border-left-color: #ef4444;" id="generic-delete-prompt">Delete the ServiceNow demo for the client with prefix: PREFIX.
+
+Run SN-Demo-Revert with clientPrefix PREFIX first, then remove any remaining demo data — incidents, users, catalog categories or items, portal widgets, branding, and logo changes — until the demo is fully gone from the instance.</div>
+            </div>
+        </section>
+
+        <!-- Use Cases -->
+        <section>
+            <h2><i class="fa-solid fa-clipboard-check" style="color: #a855f7;"></i> Use Cases</h2>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">The following use cases are fully supported and verified with this demo orchestration tool:</p>
+
+            <div style="overflow-x: auto; border-radius: 8px; border: 1px solid var(--surface-border);">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem; color: var(--text-muted);">
+                    <thead>
+                        <tr style="background: var(--table-header-bg); border-bottom: 1px solid var(--surface-border);">
+                            <th style="padding: 15px; color: var(--text-strong); font-weight: 600; width: 35%;">Use Case</th>
+                            <th style="padding: 15px; color: var(--text-strong); font-weight: 600; width: 65%;">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid var(--surface-border);">
+                            <td style="padding: 15px; color: var(--text-main); font-weight: 500;">Dummy / Test Data Population</td>
+                            <td style="padding: 15px;">Populate a ServiceNow instance with synthetic records (incidents, requests, users, CIs) without Demo Hub or z-boot.</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--surface-border); background: var(--table-alt-bg);">
+                            <td style="padding: 15px; color: var(--text-main); font-weight: 500;">Client Logo Replacement</td>
+                            <td style="padding: 15px;">Swap the default ServiceNow logo with the client's branding across the portal banner and UI header.</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--surface-border);">
+                            <td style="padding: 15px; color: var(--text-main); font-weight: 500;">Color Scheme / Theme Customization</td>
+                            <td style="padding: 15px;">Update primary, secondary, and accent colors to align with the client's brand guidelines.</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--surface-border); background: var(--table-alt-bg);">
+                            <td style="padding: 15px; color: var(--text-main); font-weight: 500;">Terminology & Label Substitution</td>
+                            <td style="padding: 15px;">Replace generic labels with client-specific terminology (e.g. Employee becomes Crew Member for McDonald's).</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--surface-border);">
+                            <td style="padding: 15px; color: var(--text-main); font-weight: 500;">Industry-Specific Category & Reference Data</td>
+                            <td style="padding: 15px;">Populate catalogue categories and reference tables with industry-relevant data (e.g. sourcing categories for a Procurement demo).</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--surface-border); background: var(--table-alt-bg);">
+                            <td style="padding: 15px; color: var(--text-main); font-weight: 500;">Industry-Specific Pre-Built Request Templates</td>
+                            <td style="padding: 15px;">Create tailored demo requests for the client's vertical (e.g. ordering store equipment and cooking supplies for McDonald's).</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--surface-border);">
+                            <td style="padding: 15px; color: var(--text-main); font-weight: 500;">Widget Header & UI Relabelling</td>
+                            <td style="padding: 15px;">Update portal widget headers and column titles to match the audience's functional area (e.g. sourcing labels for Procurement).</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--surface-border); background: var(--table-alt-bg);">
+                            <td style="padding: 15px; color: var(--text-main); font-weight: 500;">Full Client-Specific Demo Environment Package</td>
+                            <td style="padding: 15px;">Bundle all customisations (data, branding, terminology, categories, templates) into a single deployable package per client.</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--surface-border);">
+                            <td style="padding: 15px; color: var(--text-main); font-weight: 500;">Persona-Based Role & User Configuration</td>
+                            <td style="padding: 15px;">Configure demo users with personas aligned to the client's org structure - titles, departments, approval hierarchies, and data visibility.</td>
+                        </tr>
+                        <tr style="background: var(--table-alt-bg);">
+                            <td style="padding: 15px; color: var(--text-main); font-weight: 500;">Automated Demo Environment Provisioning</td>
+                            <td style="padding: 15px;">Build a pipeline that spins up a client-configured instance on demand from a config file, with no manual setup per demo.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            securityLevel: 'loose',
+            flowchart: {
+                htmlLabels: true,
+                curve: 'basis',
+                padding: 24,
+                nodeSpacing: 70,
+                rankSpacing: 90
+            },
+            themeVariables: {
+                primaryColor: '#1e293b',
+                primaryTextColor: '#f8fafc',
+                primaryBorderColor: '#00A3A1',
+                secondaryColor: '#0f172a',
+                tertiaryColor: '#334155',
+                lineColor: '#64748b',
+                clusterBkg: '#0f172a',
+                clusterBorder: '#334155',
+                edgeLabelBackground: '#1e293b',
+                fontSize: '26px',
+                fontFamily: 'Inter, sans-serif'
+            }
+        });
+
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            const btn = document.getElementById('theme-toggle');
+            if (document.body.classList.contains('light-mode')) {
+                btn.innerHTML = '<i class="fa-solid fa-moon"></i> Dark Mode';
+            } else {
+                btn.innerHTML = '<i class="fa-solid fa-sun"></i> Light Mode';
+            }
+        });
+    </script>
+</body>
+</html>

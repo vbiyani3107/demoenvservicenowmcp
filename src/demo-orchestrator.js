@@ -883,6 +883,10 @@ export async function applyPlatformDashboard(serviceNowClient, spec) {
     const layout = [];
     const widgetsSpec = Array.isArray(dashSpec.widgets) ? dashSpec.widgets : [];
 
+    let currentX = 0;
+    let currentY = 0;
+    let nextY = 0;
+
     for (const w of widgetsSpec) {
       if (!w.name || !w.type || !w.table) {
         out.errors.push(`Widget missing name, type, or table: ${JSON.stringify(w)}`);
@@ -992,14 +996,37 @@ export async function applyPlatformDashboard(serviceNowClient, spec) {
         continue;
       }
 
+      let defaultW = 12;
+      let defaultH = 10;
+      if (w.type === 'single_score') {
+        defaultW = 12; defaultH = 10;
+      } else if (w.type === 'donut' || w.type === 'bar') {
+        defaultW = 24; defaultH = 16;
+      } else if (w.type === 'list') {
+        defaultW = 48; defaultH = 20;
+      }
+
+      if (currentX + defaultW > 48) {
+        currentX = 0;
+        currentY = nextY;
+      }
+
+      const calcX = w.x != null ? w.x : currentX;
+      const calcY = w.y != null ? w.y : currentY;
+      const calcW = w.w != null ? w.w : defaultW;
+      const calcH = w.h != null ? w.h : defaultH;
+
+      currentX = calcX + calcW;
+      if (calcY + calcH > nextY) nextY = calcY + calcH;
+
       const componentPropsStr = JSON.stringify(props);
       const widgetData = {
         canvas: canvasSysId,
         component: compId,
-        x: String(w.x || 0),
-        y: String(w.y || 0),
-        w: String(w.w || 12),
-        h: String(w.h || 10),
+        x: String(calcX),
+        y: String(calcY),
+        w: String(calcW),
+        h: String(calcH),
         name: w.name,
         component_props: componentPropsStr
       };
@@ -1017,10 +1044,10 @@ export async function applyPlatformDashboard(serviceNowClient, spec) {
 
       layout.push({
         sys_id: widgetSysId,
-        x: w.x || 0,
-        y: w.y || 0,
-        w: w.w || 12,
-        h: w.h || 10,
+        x: calcX,
+        y: calcY,
+        w: calcW,
+        h: calcH,
         name: w.name,
         component_id: compId,
         component_props: componentPropsStr,
