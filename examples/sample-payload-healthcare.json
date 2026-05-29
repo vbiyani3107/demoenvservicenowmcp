@@ -142,5 +142,50 @@
       "category": "security",
       "correlation_id": "CompanyA-INC-HIPAA-006"
     }
-  ]
+  ],
+  "platformDashboard": {
+    "title": "CompanyA - Healthcare Operations Dashboard",
+    "widgets": [
+      {
+        "name": "CompanyA - Total Open Incidents",
+        "type": "single_score",
+        "table": "incident",
+        "filter": "active=true",
+        "w": 16,
+        "h": 8
+      },
+      {
+        "name": "CompanyA - Critical Incidents",
+        "type": "single_score",
+        "table": "incident",
+        "filter": "active=true^priority=1",
+        "w": 16,
+        "h": 8
+      },
+      {
+        "name": "CompanyA - Open requests by category",
+        "type": "donut",
+        "table": "incident",
+        "groupByField": "category",
+        "w": 24,
+        "h": 16
+      },
+      {
+        "name": "CompanyA - Incident trends",
+        "type": "bar",
+        "table": "incident",
+        "groupByField": "state",
+        "w": 24,
+        "h": 16
+      },
+      {
+        "name": "CompanyA - Active Incidents List",
+        "type": "list",
+        "table": "incident",
+        "filter": "active=true",
+        "w": 48,
+        "h": 20
+      }
+    ]
+  }
 }
